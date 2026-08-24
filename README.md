@@ -19,8 +19,6 @@ FeelFX doesn't simply generate subtitles. It **watches the video, understands wh
   
 The important part is that **none of these effects are manually placed on the timeline**.
 
-FeelFX analyzes the video → identifies meaningful moments → makes motion-design decisions → renders them over the original footage.
-
 ## 🚀 What FeelFX Does
 
 Instead of asking:
