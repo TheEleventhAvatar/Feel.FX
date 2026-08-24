@@ -1,6 +1,6 @@
 # FeelFX
 
-> **AI that feels a video — then turns that feeling into motion graphics.**
+> **FeelFX analyzes the video → identifies meaningful moments → makes motion-design decisions → renders them over the original footage.**
 
 
 
