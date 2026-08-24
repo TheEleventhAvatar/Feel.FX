@@ -648,3 +648,289 @@ textarea {
     height: 200px;
   }
 }
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+  html,
+  body {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  body {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  #app {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .app {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .header {
+    height: 58px;
+    padding: 0 16px;
+  }
+
+  .brand {
+    font-size: 20px;
+  }
+
+  .engine-status {
+    font-size: 8px;
+    letter-spacing: 0.8px;
+  }
+
+  .workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  /* -------------------------
+     VIDEO
+     ------------------------- */
+
+  .video-panel {
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 16 / 9;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .video-panel video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .motion-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .upload-button {
+    min-height: 46px;
+    padding: 0 18px;
+    font-size: 12px;
+  }
+
+  /* -------------------------
+     ANALYSIS
+     ------------------------- */
+
+  .analysis-panel {
+    width: 100%;
+    min-width: 0;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .panel-title {
+    font-size: 10px;
+  }
+
+  .feel-result {
+    padding: 18px;
+  }
+
+  .feel {
+    font-size: clamp(28px, 9vw, 52px);
+  }
+
+  .confidence {
+    font-size: 11px;
+  }
+
+  .ai-stage {
+    padding: 14px;
+  }
+
+  .stage-text {
+    font-size: 11px;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .metric {
+    min-height: 70px;
+  }
+
+  .reasoning {
+    padding: 14px;
+  }
+
+  .transcript {
+    padding: 14px;
+  }
+
+  .transcript textarea {
+    min-height: 100px;
+    font-size: 12px;
+  }
+
+  .analyze-button {
+    width: 100%;
+    min-height: 52px;
+    font-size: 13px;
+    touch-action: manipulation;
+  }
+
+  /* -------------------------
+     OUTPUT
+     ------------------------- */
+
+  .output-panel {
+    margin: 0 12px 12px;
+    width: auto;
+    min-width: 0;
+  }
+
+  .output-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .summary {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .events-layout {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .events {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .event {
+    grid-template-columns: 58px 1fr;
+  }
+
+  .event-main {
+    min-width: 0;
+  }
+
+  .event-text {
+    overflow-wrap: anywhere;
+  }
+
+  #dsl {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+    font-size: 9px;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0 12px;
+  }
+
+  .engine-status {
+    max-width: 130px;
+    text-align: right;
+    line-height: 1.2;
+  }
+
+  .workspace {
+    padding: 8px;
+  }
+
+  .video-panel {
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+  }
+
+  .video-placeholder {
+    font-size: 11px;
+  }
+
+  .upload-icon {
+    font-size: 26px;
+  }
+
+  .feel-result {
+    padding: 16px;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .metric span {
+    font-size: 8px;
+  }
+
+  .metric strong {
+    font-size: 14px;
+  }
+
+  .event {
+    grid-template-columns: 50px 1fr;
+    padding: 10px;
+  }
+
+  .event-time {
+    font-size: 9px;
+  }
+
+  .event-type {
+    font-size: 10px;
+  }
+
+  .event-motion {
+    font-size: 9px;
+  }
+
+  .output-panel {
+    margin: 0 8px 8px;
+  }
+}
+
+
+/* =========================================================
+   TOUCH DEVICES
+   ========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  button {
+    cursor: default;
+  }
+
+  .upload-button,
+  .analyze-button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  video {
+    touch-action: manipulation;
+  }
+}
