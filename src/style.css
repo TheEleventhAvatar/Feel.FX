@@ -41,8 +41,13 @@ textarea {
     );
 }
 
+/* =========================================================
+   HEADER
+   ========================================================= */
+
 .header {
   height: 70px;
+  min-height: 70px;
   flex-shrink: 0;
 
   display: flex;
@@ -53,16 +58,16 @@ textarea {
 
   border-bottom:
     1px solid
-    rgba(255, 255, 255, .08);
+    rgba(255, 255, 255, 0.08);
 
   background:
-    rgba(5, 5, 5, .85);
+    rgba(5, 5, 5, 0.85);
 }
 
 .brand {
   font-size: 24px;
   font-weight: 900;
-  letter-spacing: -.06em;
+  letter-spacing: -0.06em;
 }
 
 .brand b {
@@ -74,17 +79,18 @@ textarea {
   align-items: center;
   gap: 8px;
 
-  color:
-    rgba(255,255,255,.4);
+  color: rgba(255, 255, 255, 0.4);
 
   font-size: 9px;
   font-weight: 800;
-  letter-spacing: .14em;
+  letter-spacing: 0.14em;
 }
 
 .status-dot {
   width: 6px;
   height: 6px;
+
+  flex-shrink: 0;
 
   border-radius: 50%;
 
@@ -93,6 +99,10 @@ textarea {
   box-shadow:
     0 0 12px white;
 }
+
+/* =========================================================
+   DESKTOP WORKSPACE
+   ========================================================= */
 
 .workspace {
   flex: 1;
@@ -107,8 +117,12 @@ textarea {
   gap: 1px;
 
   background:
-    rgba(255,255,255,.07);
+    rgba(255, 255, 255, 0.07);
 }
+
+/* =========================================================
+   VIDEO
+   ========================================================= */
 
 .video-panel {
   position: relative;
@@ -151,6 +165,7 @@ textarea {
   overflow: hidden;
 }
 
+.motion-layer canvas,
 .motion-canvas {
   position: absolute;
 
@@ -180,16 +195,16 @@ textarea {
   pointer-events: none;
 
   color:
-    rgba(255,255,255,.4);
+    rgba(255, 255, 255, 0.4);
 
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: .12em;
+  letter-spacing: 0.12em;
 }
 
 .video-placeholder small {
   color:
-    rgba(255,255,255,.2);
+    rgba(255, 255, 255, 0.2);
 
   font-size: 9px;
   font-weight: 400;
@@ -214,23 +229,27 @@ textarea {
 
   border:
     1px solid
-    rgba(255,255,255,.12);
+    rgba(255, 255, 255, 0.12);
 
   border-radius: 7px;
 
   color:
-    rgba(255,255,255,.7);
+    rgba(255, 255, 255, 0.7);
 
   background:
-    rgba(0,0,0,.7);
+    rgba(0, 0, 0, 0.7);
 
   font-size: 9px;
   font-weight: 800;
 
-  letter-spacing: .1em;
+  letter-spacing: 0.1em;
 
   cursor: pointer;
 }
+
+/* =========================================================
+   ANALYSIS PANEL
+   ========================================================= */
 
 .analysis-panel {
   min-height: 0;
@@ -245,12 +264,12 @@ textarea {
 .panel-title,
 .small-label {
   color:
-    rgba(255,255,255,.3);
+    rgba(255, 255, 255, 0.3);
 
   font-size: 8px;
   font-weight: 800;
 
-  letter-spacing: .15em;
+  letter-spacing: 0.15em;
 }
 
 .feel-result {
@@ -260,7 +279,7 @@ textarea {
 
   border-bottom:
     1px solid
-    rgba(255,255,255,.08);
+    rgba(255, 255, 255, 0.08);
 }
 
 .feel {
@@ -271,14 +290,14 @@ textarea {
 
   line-height: 1;
 
-  letter-spacing: -.06em;
+  letter-spacing: -0.06em;
 }
 
 .confidence {
   margin-top: 8px;
 
   color:
-    rgba(255,255,255,.4);
+    rgba(255, 255, 255, 0.4);
 
   font-size: 10px;
 }
@@ -291,7 +310,7 @@ textarea {
   min-height: 18px;
 
   color:
-    rgba(255,255,255,.65);
+    rgba(255, 255, 255, 0.65);
 
   font-size: 10px;
 }
@@ -305,7 +324,7 @@ textarea {
   overflow: hidden;
 
   background:
-    rgba(255,255,255,.08);
+    rgba(255, 255, 255, 0.08);
 }
 
 .progress div {
@@ -315,7 +334,7 @@ textarea {
   background: white;
 
   transition:
-    width .3s ease;
+    width 0.3s ease;
 }
 
 .metrics {
@@ -330,25 +349,25 @@ textarea {
 
   border:
     1px solid
-    rgba(255,255,255,.07);
+    rgba(255, 255, 255, 0.07);
 }
 
 .metric {
   padding: 13px;
 
   background:
-    rgba(255,255,255,.025);
+    rgba(255, 255, 255, 0.025);
 }
 
 .metric span {
   display: block;
 
   color:
-    rgba(255,255,255,.3);
+    rgba(255, 255, 255, 0.3);
 
   font-size: 8px;
 
-  letter-spacing: .12em;
+  letter-spacing: 0.12em;
 }
 
 .metric strong {
@@ -366,10 +385,10 @@ textarea {
 
   border-bottom:
     1px solid
-    rgba(255,255,255,.08);
+    rgba(255, 255, 255, 0.08);
 
   color:
-    rgba(255,255,255,.55);
+    rgba(255, 255, 255, 0.55);
 
   font-size: 10px;
 
@@ -396,15 +415,15 @@ textarea {
 
   border:
     1px solid
-    rgba(255,255,255,.1);
+    rgba(255, 255, 255, 0.1);
 
   border-radius: 7px;
 
   color:
-    rgba(255,255,255,.7);
+    rgba(255, 255, 255, 0.7);
 
   background:
-    rgba(255,255,255,.035);
+    rgba(255, 255, 255, 0.035);
 
   font-size: 9px;
 
@@ -419,42 +438,44 @@ textarea {
 
   border:
     1px solid
-    rgba(255,255,255,.18);
+    rgba(255, 255, 255, 0.18);
 
   border-radius: 8px;
 
   color: white;
 
   background:
-    rgba(255,255,255,.08);
+    rgba(255, 255, 255, 0.08);
 
   font-size: 10px;
   font-weight: 800;
 
-  letter-spacing: .12em;
+  letter-spacing: 0.12em;
 
   cursor: pointer;
 
   transition:
-    transform .2s ease,
-    background .2s ease;
+    transform 0.2s ease,
+    background 0.2s ease;
 }
 
-.analyze-button:hover:not(
-  :disabled
-) {
+.analyze-button:hover:not(:disabled) {
   transform:
     translateY(-1px);
 
   background:
-    rgba(255,255,255,.14);
+    rgba(255, 255, 255, 0.14);
 }
 
 .analyze-button:disabled {
-  opacity: .4;
+  opacity: 0.4;
 
   cursor: not-allowed;
 }
+
+/* =========================================================
+   OUTPUT PANEL
+   ========================================================= */
 
 .output-panel {
   height: 260px;
@@ -466,7 +487,7 @@ textarea {
 
   border-top:
     1px solid
-    rgba(255,255,255,.08);
+    rgba(255, 255, 255, 0.08);
 
   overflow: hidden;
 }
@@ -482,7 +503,7 @@ textarea {
   margin-top: 5px;
 
   color:
-    rgba(255,255,255,.55);
+    rgba(255, 255, 255, 0.55);
 
   font-size: 10px;
 }
@@ -492,17 +513,17 @@ textarea {
 
   border:
     1px solid
-    rgba(255,255,255,.1);
+    rgba(255, 255, 255, 0.1);
 
   border-radius: 5px;
 
   color:
-    rgba(255,255,255,.45);
+    rgba(255, 255, 255, 0.45);
 
   font-size: 8px;
   font-weight: 800;
 
-  letter-spacing: .1em;
+  letter-spacing: 0.1em;
 }
 
 .events-layout {
@@ -535,11 +556,11 @@ textarea {
 
   border-bottom:
     1px solid
-    rgba(255,255,255,.05);
+    rgba(255, 255, 255, 0.05);
 
   transition:
-    opacity .2s ease,
-    transform .2s ease;
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .event-active {
@@ -555,7 +576,7 @@ textarea {
   flex-shrink: 0;
 
   color:
-    rgba(255,255,255,.3);
+    rgba(255, 255, 255, 0.3);
 
   font-family:
     Consolas,
@@ -570,7 +591,7 @@ textarea {
 
 .event-type {
   color:
-    rgba(255,255,255,.35);
+    rgba(255, 255, 255, 0.35);
 
   font-size: 7px;
 
@@ -578,14 +599,14 @@ textarea {
 
   text-transform: uppercase;
 
-  letter-spacing: .12em;
+  letter-spacing: 0.12em;
 }
 
 .event-text {
   margin-top: 3px;
 
   color:
-    rgba(255,255,255,.65);
+    rgba(255, 255, 255, 0.65);
 
   font-size: 9px;
 
@@ -596,7 +617,7 @@ textarea {
   margin-top: 3px;
 
   color:
-    rgba(255,255,255,.3);
+    rgba(255, 255, 255, 0.3);
 
   font-size: 7px;
 
@@ -609,7 +630,7 @@ textarea {
   padding-top: 20px;
 
   color:
-    rgba(255,255,255,.2);
+    rgba(255, 255, 255, 0.2);
 
   font-size: 9px;
 }
@@ -622,7 +643,7 @@ textarea {
   overflow: auto;
 
   color:
-    rgba(255,255,255,.4);
+    rgba(255, 255, 255, 0.4);
 
   font-family:
     Consolas,
@@ -633,32 +654,32 @@ textarea {
   line-height: 1.45;
 }
 
-@media (
-  max-width: 850px
-) {
+/* =========================================================
+   DESKTOP ONLY — NO CHANGE
+   ========================================================= */
+
+@media (min-width: 769px) {
   .workspace {
-    grid-template-columns: 1fr;
-  }
-
-  .analysis-panel {
-    display: none;
-  }
-
-  .output-panel {
-    height: 200px;
+    grid-template-columns:
+      minmax(0, 1fr)
+      360px;
   }
 }
 
 /* =========================================================
    MOBILE
+   Completely isolated from desktop.
    ========================================================= */
 
 @media (max-width: 768px) {
   html,
   body {
     width: 100%;
+    height: 100%;
     min-width: 0;
+
     overflow-x: hidden;
+    overflow-y: auto;
   }
 
   body {
@@ -668,296 +689,17 @@ textarea {
   #app {
     width: 100%;
     min-width: 0;
+    min-height: 100%;
   }
 
   .app {
     width: 100%;
     min-width: 0;
-  }
+    min-height: 100%;
+    height: auto;
 
-  .header {
-    height: 58px;
-    padding: 0 16px;
-  }
-
-  .brand {
-    font-size: 20px;
-  }
-
-  .engine-status {
-    font-size: 8px;
-    letter-spacing: 0.8px;
-  }
-
-  .workspace {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 12px;
-  }
-
-  /* -------------------------
-     VIDEO
-     ------------------------- */
-
-  .video-panel {
-    width: 100%;
-    min-width: 0;
-    aspect-ratio: 16 / 9;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .video-panel video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
-  .motion-layer {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .upload-button {
-    min-height: 46px;
-    padding: 0 18px;
-    font-size: 12px;
-  }
-
-  /* -------------------------
-     ANALYSIS
-     ------------------------- */
-
-  .analysis-panel {
-    width: 100%;
-    min-width: 0;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .panel-title {
-    font-size: 10px;
-  }
-
-  .feel-result {
-    padding: 18px;
-  }
-
-  .feel {
-    font-size: clamp(28px, 9vw, 52px);
-  }
-
-  .confidence {
-    font-size: 11px;
-  }
-
-  .ai-stage {
-    padding: 14px;
-  }
-
-  .stage-text {
-    font-size: 11px;
-  }
-
-  .metrics {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
-  .metric {
-    min-height: 70px;
-  }
-
-  .reasoning {
-    padding: 14px;
-  }
-
-  .transcript {
-    padding: 14px;
-  }
-
-  .transcript textarea {
-    min-height: 100px;
-    font-size: 12px;
-  }
-
-  .analyze-button {
-    width: 100%;
-    min-height: 52px;
-    font-size: 13px;
-    touch-action: manipulation;
-  }
-
-  /* -------------------------
-     OUTPUT
-     ------------------------- */
-
-  .output-panel {
-    margin: 0 12px 12px;
-    width: auto;
-    min-width: 0;
-  }
-
-  .output-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .summary {
-    font-size: 13px;
-    line-height: 1.4;
-  }
-
-  .events-layout {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-
-  .events {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .event {
-    grid-template-columns: 58px 1fr;
-  }
-
-  .event-main {
-    min-width: 0;
-  }
-
-  .event-text {
-    overflow-wrap: anywhere;
-  }
-
-  #dsl {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    overflow-x: auto;
-    font-size: 9px;
-  }
-}
-
-
-/* =========================================================
-   SMALL PHONES
-   ========================================================= */
-
-@media (max-width: 480px) {
-  .header {
-    padding: 0 12px;
-  }
-
-  .engine-status {
-    max-width: 130px;
-    text-align: right;
-    line-height: 1.2;
-  }
-
-  .workspace {
-    padding: 8px;
-  }
-
-  .video-panel {
-    aspect-ratio: 16 / 9;
-    border-radius: 10px;
-  }
-
-  .video-placeholder {
-    font-size: 11px;
-  }
-
-  .upload-icon {
-    font-size: 26px;
-  }
-
-  .feel-result {
-    padding: 16px;
-  }
-
-  .metrics {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .metric span {
-    font-size: 8px;
-  }
-
-  .metric strong {
-    font-size: 14px;
-  }
-
-  .event {
-    grid-template-columns: 50px 1fr;
-    padding: 10px;
-  }
-
-  .event-time {
-    font-size: 9px;
-  }
-
-  .event-type {
-    font-size: 10px;
-  }
-
-  .event-motion {
-    font-size: 9px;
-  }
-
-  .output-panel {
-    margin: 0 8px 8px;
-  }
-}
-
-
-/* =========================================================
-   TOUCH DEVICES
-   ========================================================= */
-
-@media (hover: none) and (pointer: coarse) {
-  button {
-    cursor: default;
-  }
-
-  .upload-button,
-  .analyze-button {
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  video {
-    touch-action: manipulation;
-  }
-}
-
-/* =========================================================
-   FEELFX — MOBILE CREATIVE LAYOUT
-   Desktop is completely unaffected.
-   ========================================================= */
-
-@media (max-width: 768px) {
-  html,
-  body {
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-  }
-
-  body {
-    -webkit-text-size-adjust: 100%;
-  }
-
-  #app,
-  .app {
-    width: 100%;
-    min-width: 0;
   }
 
   /* =======================================================
@@ -967,8 +709,11 @@ textarea {
   .header {
     height: 56px;
     min-height: 56px;
+
     padding: 0 14px;
-    box-sizing: border-box;
+
+    position: relative;
+    z-index: 50;
   }
 
   .brand {
@@ -977,162 +722,286 @@ textarea {
 
   .engine-status {
     font-size: 7px;
-    letter-spacing: 0.7px;
+    letter-spacing: 0.07em;
     text-align: right;
     line-height: 1.2;
   }
 
   /* =======================================================
      MOBILE WORKSPACE
+
+     VIDEO
+       ↓
+     AI CONTROLS
      
-     VIDEO = HERO
-     AI CONTROLS = BELOW
+     The entire workspace is allowed to grow vertically.
+     This fixes the old problem where the Feel button was
+     pushed outside the viewport by the 100% desktop layout.
      ======================================================= */
 
   .workspace {
+    width: 100%;
+    min-height: 0;
+    height: auto;
+
+    flex: none;
+
     display: flex;
     flex-direction: column;
+
     gap: 12px;
-    width: 100%;
+
     padding: 10px;
-    box-sizing: border-box;
+
+    background: #070707;
   }
 
   /* =======================================================
-     VIDEO HERO
+     VIDEO — TOP ~45% / HERO
      ======================================================= */
 
   .video-panel {
     position: relative;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    min-height: 0;
-    max-height: none;
-    overflow: hidden;
-    border-radius: 12px;
-    box-sizing: border-box;
-  }
 
-  .video-panel video {
-    display: block;
     width: 100%;
-    height: 100%;
-    object-fit: contain;
+
+    /*
+     * Roughly the top 45% of a phone screen.
+     * Aspect ratio prevents distortion.
+     */
+    height: min(45vh, 420px);
+    min-height: 230px;
+
+    flex: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border-radius: 12px;
+
     background: #000;
   }
 
-  /*
-   * Motion graphics stay directly over the video.
-   */
+  #video {
+    position: relative;
+    z-index: 1;
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    background: #000;
+  }
 
   .motion-layer {
     position: absolute;
+
     inset: 0;
+
+    z-index: 5;
+
     width: 100%;
     height: 100%;
+
     pointer-events: none;
-    z-index: 5;
   }
 
-  .motion-layer canvas {
+  .motion-layer canvas,
+  .motion-canvas {
+    position: absolute;
+
+    inset: 0;
+
     display: block;
+
     width: 100% !important;
     height: 100% !important;
+
+    pointer-events: none;
   }
 
-  /*
-   * Upload UI remains above the video.
-   */
+  /* =======================================================
+     UPLOAD BUTTON
 
-  .video-placeholder {
-    position: absolute;
-    inset: 0;
-    z-index: 10;
-  }
+     Keep it BELOW the actual video controls rather than
+     sitting across the middle of the player.
+     ======================================================= */
 
   .upload-button {
     position: absolute;
-    z-index: 20;
-    bottom: 12px;
+
+    top: auto;
     left: 50%;
-    transform: translateX(-50%);
+    bottom: 12px;
+
+    z-index: 20;
+
+    transform:
+      translateX(-50%);
+
     min-height: 44px;
+
     padding: 0 18px;
+
     white-space: nowrap;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.18);
+
+    border-radius: 8px;
+
+    color: white;
+
+    background:
+      rgba(0, 0, 0, 0.82);
+
+    backdrop-filter: blur(10px);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.1em;
+
+    cursor: pointer;
+
     touch-action: manipulation;
+
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .video-placeholder {
+    z-index: 10;
   }
 
   /* =======================================================
      AI PANEL
+
+     IMPORTANT:
+     It is NOT display:none anymore.
+     The FEEL THE VIDEO button is therefore visible.
      ======================================================= */
 
   .analysis-panel {
     width: 100%;
     min-width: 0;
+
+    height: auto;
     max-height: none;
+
+    flex: none;
+
+    padding: 16px;
+
     overflow: visible;
-    box-sizing: border-box;
+
+    background: #080808;
+
+    border-radius: 12px;
   }
 
   .panel-title {
     font-size: 9px;
-    letter-spacing: 1px;
+    letter-spacing: 0.12em;
   }
 
-  /* =======================================================
-     FEEL RESULT
-     ======================================================= */
-
   .feel-result {
+    margin-top: 18px;
+
     padding: 16px;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.07);
+
+    border-radius: 9px;
+
+    background:
+      rgba(255, 255, 255, 0.025);
   }
 
   .feel {
-    font-size: clamp(30px, 10vw, 52px);
+    font-size:
+      clamp(30px, 10vw, 52px);
+
     line-height: 0.95;
+
     word-break: break-word;
   }
 
   .confidence {
     font-size: 10px;
-    margin-top: 8px;
   }
 
   /* =======================================================
-     AI PROCESSING STAGE
+     AI STAGE
      ======================================================= */
 
   .ai-stage {
+    margin-top: 14px;
+
     padding: 14px;
+
+    border-radius: 8px;
+
+    background:
+      rgba(255, 255, 255, 0.025);
   }
 
   .stage-text {
+    min-height: 18px;
+
     font-size: 10px;
+
     line-height: 1.4;
   }
 
   /* =======================================================
-     SIGNAL METRICS
+     METRICS
      ======================================================= */
 
   .metrics {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 7px;
+
+    margin-top: 14px;
+
+    border: 0;
   }
 
   .metric {
     min-width: 0;
-    min-height: 64px;
-    box-sizing: border-box;
+    min-height: 62px;
+
+    padding: 12px;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.06);
+
+    border-radius: 8px;
+
+    background:
+      rgba(255, 255, 255, 0.025);
   }
 
   .metric span {
-    font-size: 8px;
+    font-size: 7px;
   }
 
   .metric strong {
+    margin-top: 6px;
+
     font-size: 14px;
   }
 
@@ -1141,12 +1010,19 @@ textarea {
      ======================================================= */
 
   .reasoning {
-    padding: 14px;
-  }
+    margin-top: 14px;
 
-  .reasoning-text {
-    font-size: 11px;
-    line-height: 1.5;
+    padding: 14px;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.06);
+
+    border-radius: 8px;
+
+    font-size: 10px;
+
+    line-height: 1.7;
   }
 
   /* =======================================================
@@ -1154,51 +1030,109 @@ textarea {
      ======================================================= */
 
   .transcript {
+    margin-top: 14px;
+
     padding: 14px;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.06);
+
+    border-radius: 8px;
+
+    background:
+      rgba(255, 255, 255, 0.02);
   }
 
   .transcript textarea {
     width: 100%;
-    min-height: 90px;
-    box-sizing: border-box;
+    height: 90px;
+
+    margin-top: 9px;
+
     font-size: 11px;
+
     line-height: 1.45;
   }
 
   /* =======================================================
-     FEEL BUTTON
+     FEEL THE VIDEO
+
+     Always visible below the AI controls.
      ======================================================= */
 
   .analyze-button {
+    display: block;
+
     width: 100%;
-    min-height: 52px;
-    margin-top: 4px;
+
+    min-height: 54px;
+
+    margin-top: 14px;
+
+    padding: 15px;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.2);
+
+    border-radius: 9px;
+
     font-size: 12px;
+    font-weight: 800;
+
+    letter-spacing: 0.12em;
+
     touch-action: manipulation;
+
     -webkit-tap-highlight-color: transparent;
   }
 
   /* =======================================================
-     LIVE MOTION OUTPUT
+     OUTPUT PANEL
+
+     Kept BELOW the AI controls instead of stealing
+     viewport height from the Feel button.
      ======================================================= */
 
   .output-panel {
     width: calc(100% - 20px);
-    margin: 0 10px 10px;
-    min-width: 0;
-    box-sizing: border-box;
+
+    height: auto;
+    min-height: 300px;
+
+    flex: none;
+
+    margin: 0 10px 16px;
+
+    padding: 16px;
+
+    overflow: visible;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.07);
+
+    border-radius: 12px;
+
+    background: #070707;
   }
 
   .output-header {
     display: flex;
+
     flex-direction: column;
+
     align-items: flex-start;
+
     gap: 10px;
   }
 
   .summary {
     font-size: 12px;
+
     line-height: 1.4;
+
     overflow-wrap: anywhere;
   }
 
@@ -1211,59 +1145,96 @@ textarea {
      ======================================================= */
 
   .events-layout {
+    height: auto;
+
     display: flex;
+
     flex-direction: column;
-    width: 100%;
-    min-width: 0;
+
+    gap: 14px;
+
+    margin-top: 14px;
   }
 
   .events {
     width: 100%;
+    height: 220px;
+
     min-width: 0;
+
+    overflow-y: auto;
+
+    padding-right: 4px;
   }
 
   .event {
-    grid-template-columns: 52px minmax(0, 1fr);
+    display: flex;
+
     min-width: 0;
+
+    gap: 10px;
+
+    padding: 10px 0;
+  }
+
+  .event-time {
+    width: 48px;
+
+    font-size: 8px;
   }
 
   .event-main {
     min-width: 0;
   }
 
+  .event-type {
+    font-size: 7px;
+  }
+
   .event-text {
+    font-size: 10px;
+
     overflow-wrap: anywhere;
     word-break: break-word;
   }
 
   .event-motion {
+    font-size: 8px;
+
     overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   /* =======================================================
-     GENERATED DSL
+     DSL
      ======================================================= */
 
   #dsl {
     width: 100%;
-    max-width: 100%;
+    height: 180px;
+
     min-width: 0;
-    box-sizing: border-box;
-    overflow-x: auto;
-    white-space: pre;
+    max-width: 100%;
+
+    overflow: auto;
+
     font-size: 8px;
+
     line-height: 1.4;
+
+    white-space: pre;
   }
 }
 
-
 /* =========================================================
    SMALL PHONES
-   Still mobile-only.
    ========================================================= */
 
 @media (max-width: 480px) {
   .header {
+    height: 52px;
+    min-height: 52px;
+
     padding: 0 10px;
   }
 
@@ -1273,22 +1244,37 @@ textarea {
 
   .engine-status {
     max-width: 120px;
+
+    font-size: 6px;
+
+    text-align: right;
   }
 
   .workspace {
     padding: 8px;
+
     gap: 10px;
   }
 
   .video-panel {
+    height: 42vh;
+    min-height: 210px;
+
     border-radius: 10px;
   }
 
   .upload-button {
     bottom: 8px;
+
     min-height: 42px;
+
     padding: 0 14px;
-    font-size: 10px;
+
+    font-size: 9px;
+  }
+
+  .analysis-panel {
+    padding: 13px;
   }
 
   .feel-result {
@@ -1296,7 +1282,8 @@ textarea {
   }
 
   .feel {
-    font-size: clamp(28px, 11vw, 46px);
+    font-size:
+      clamp(28px, 11vw, 46px);
   }
 
   .metrics {
@@ -1304,7 +1291,9 @@ textarea {
   }
 
   .metric {
-    min-height: 60px;
+    min-height: 58px;
+
+    padding: 10px;
   }
 
   .metric span {
@@ -1315,13 +1304,22 @@ textarea {
     font-size: 13px;
   }
 
+  .analyze-button {
+    min-height: 52px;
+
+    font-size: 11px;
+  }
+
   .output-panel {
     width: calc(100% - 16px);
+
     margin-left: 8px;
     margin-right: 8px;
+    margin-bottom: 8px;
+
+    padding: 14px;
   }
 }
-
 
 /* =========================================================
    TOUCH DEVICES
@@ -1334,6 +1332,10 @@ textarea {
 
   .upload-button,
   .analyze-button {
+    touch-action: manipulation;
+  }
+
+  video {
     touch-action: manipulation;
   }
 }
