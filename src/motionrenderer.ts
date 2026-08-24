@@ -44,13 +44,6 @@ type MotionEvent = {
   keywords?: MotionKeyword[]
 }
 
-type ActiveObject = {
-  object: THREE.Object3D
-  materials: THREE.Material[]
-  geometries: THREE.BufferGeometry[]
-  textures: THREE.Texture[]
-}
-
 export class MotionRenderer {
   private container: HTMLElement
 
@@ -59,8 +52,6 @@ export class MotionRenderer {
   private renderer: THREE.WebGLRenderer
 
   private events: MotionEvent[] = []
-
-  private activeObjects: ActiveObject[] = []
 
   private triggered = new Set<string>()
 
@@ -145,6 +136,7 @@ export class MotionRenderer {
     this.events = events || []
 
     this.triggered.clear()
+    this.currentTime = 0
   }
 
   updateVideoTime(
@@ -168,6 +160,8 @@ export class MotionRenderer {
     ) {
       const event =
         this.events[i]
+
+      if (!event) continue
 
       const eventKey =
         `${i}-${event.time}-${event.type}`
@@ -234,9 +228,7 @@ export class MotionRenderer {
         type
       )
     ) {
-      this.createRocketFury(
-        event
-      )
+      this.createRocketFury()
     }
 
     if (
@@ -245,9 +237,7 @@ export class MotionRenderer {
         type
       )
     ) {
-      this.createWaterSplash(
-        event
-      )
+      this.createWaterSplash()
     }
 
     if (
@@ -256,9 +246,7 @@ export class MotionRenderer {
         type
       )
     ) {
-      this.createTricolorBurst(
-        event
-      )
+      this.createTricolorBurst()
     }
 
     if (
@@ -267,9 +255,7 @@ export class MotionRenderer {
         type
       )
     ) {
-      this.createExplosion(
-        event
-      )
+      this.createExplosion()
     }
 
     if (
@@ -278,9 +264,7 @@ export class MotionRenderer {
         type
       )
     ) {
-      this.createMusicEnergy(
-        event
-      )
+      this.createMusicEnergy()
     }
 
     /*
@@ -437,10 +421,7 @@ export class MotionRenderer {
     ctx.textBaseline =
       'middle'
 
-    /*
-     * Tricolor clipping.
-     */
-
+    // Saffron
     ctx.save()
 
     ctx.beginPath()
@@ -465,6 +446,7 @@ export class MotionRenderer {
 
     ctx.restore()
 
+    // White
     ctx.save()
 
     ctx.beginPath()
@@ -489,6 +471,7 @@ export class MotionRenderer {
 
     ctx.restore()
 
+    // Green
     ctx.save()
 
     ctx.beginPath()
@@ -513,9 +496,7 @@ export class MotionRenderer {
 
     ctx.restore()
 
-    /*
-     * Ashoka Chakra.
-     */
+    // Ashoka Chakra
     ctx.strokeStyle =
       '#000080'
 
@@ -595,9 +576,7 @@ export class MotionRenderer {
 
     group.add(mesh)
 
-    /*
-     * Tricolor particles.
-     */
+    // Tricolor particles
     for (
       let i = 0;
       i < 35;
@@ -703,9 +682,12 @@ export class MotionRenderer {
       {
         alpha: 0,
         delay:
-          (keyword.duration ??
-            2) -
-          0.5,
+          Math.max(
+            0.5,
+            (keyword.duration ??
+              2) -
+              0.5
+          ),
         duration: 0.5,
         onComplete: () =>
           this.removeObject(
@@ -838,9 +820,7 @@ export class MotionRenderer {
       }
     )
 
-    /*
-     * Fire streaks.
-     */
+    // Fire streaks
     for (
       let i = 0;
       i < 25;
@@ -992,8 +972,7 @@ export class MotionRenderer {
       }
     )
 
-    const flashes =
-      5
+    const flashes = 5
 
     for (
       let i = 0;
@@ -1003,7 +982,8 @@ export class MotionRenderer {
       gsap.to(
         group,
         {
-          visible: i % 2 === 0,
+          visible:
+            i % 2 === 0,
           delay:
             i * 0.08,
           duration: 0.05
@@ -1104,13 +1084,15 @@ export class MotionRenderer {
       material.opacity = 0
     }
 
-    gsap.to(
-      material || {},
-      {
-        opacity: 1,
-        duration: 0.5
-      }
-    )
+    if (material) {
+      gsap.to(
+        material,
+        {
+          opacity: 1,
+          duration: 0.5
+        }
+      )
+    }
 
     gsap.to(
       group.scale,
@@ -1188,9 +1170,7 @@ export class MotionRenderer {
   // ROCKET
   // --------------------------------------------------
 
-  private createRocketFury(
-    event: MotionEvent
-  ) {
+  private createRocketFury() {
     const group =
       new THREE.Group()
 
@@ -1253,11 +1233,7 @@ export class MotionRenderer {
             Math.random() *
               0.5,
           repeat: 2,
-          ease: 'power4.in',
-          onComplete: () =>
-            this.removeObject(
-              line
-            )
+          ease: 'power4.in'
         }
       )
     }
@@ -1311,9 +1287,7 @@ export class MotionRenderer {
   // BEACH
   // --------------------------------------------------
 
-  private createWaterSplash(
-    event: MotionEvent
-  ) {
+  private createWaterSplash() {
     const group =
       new THREE.Group()
 
@@ -1393,9 +1367,7 @@ export class MotionRenderer {
   // INDIA VISUAL
   // --------------------------------------------------
 
-  private createTricolorBurst(
-    event: MotionEvent
-  ) {
+  private createTricolorBurst() {
     const group =
       new THREE.Group()
 
@@ -1489,9 +1461,7 @@ export class MotionRenderer {
   // EXPLOSION
   // --------------------------------------------------
 
-  private createExplosion(
-    event: MotionEvent
-  ) {
+  private createExplosion() {
     const group =
       new THREE.Group()
 
@@ -1551,9 +1521,7 @@ export class MotionRenderer {
   // MUSIC
   // --------------------------------------------------
 
-  private createMusicEnergy(
-    event: MotionEvent
-  ) {
+  private createMusicEnergy() {
     const group =
       new THREE.Group()
 
