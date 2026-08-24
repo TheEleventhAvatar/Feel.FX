@@ -5,18 +5,29 @@ import {
 
 env.allowLocalModels = false
 
-type AnalyzerPipeline = (
-  input: any,
-  options?: any
-) => Promise<any>
+type ASRPipeline = Awaited<ReturnType<typeof pipeline>>
+type VisionPipeline = Awaited<ReturnType<typeof pipeline>>
 
-type ASRPipeline = AnalyzerPipeline
-type VisionPipeline = AnalyzerPipeline
+export type TranscriptSegment = {
+  start: number
+  end: number
+  text: string
+}
+
+export type VisualFrame = {
+  time: number
+  description: string
+}
 
 export type AIAnalysis = {
   transcript: string
 
+  transcriptSegments:
+    TranscriptSegment[]
+
   visualDescriptions: string[]
+
+  visualFrames: VisualFrame[]
 
   feel:
     | 'corporate'
@@ -45,19 +56,26 @@ export type AIAnalysis = {
 }
 
 export class AIVideoAnalyzer {
-  private transcriber: ASRPipeline | null = null
+  private transcriber:
+    ASRPipeline | null = null
 
-  private vision: VisionPipeline | null = null
+  private vision:
+    VisionPipeline | null = null
 
   private loading = false
 
   private canvas =
-    document.createElement('canvas')
+    document.createElement(
+      'canvas'
+    )
 
   private context =
-    this.canvas.getContext('2d', {
-      willReadFrequently: true
-    })
+    this.canvas.getContext(
+      '2d',
+      {
+        willReadFrequently: true
+      }
+    )
 
   async loadModels(
     onProgress?: (
@@ -80,29 +98,51 @@ export class AIVideoAnalyzer {
         'Loading local speech model…'
       )
 
-      this.transcriber =
-        await pipeline(
-          'automatic-speech-recognition',
-          'onnx-community/whisper-tiny.en',
-          {
-            device:
-              'webgpu'
-          } as any
-        )
+      try {
+        this.transcriber =
+          await pipeline(
+            'automatic-speech-recognition',
+            'onnx-community/whisper-tiny.en',
+            {
+              device:
+                'webgpu'
+            } as any
+          )
+      } catch {
+        this.transcriber =
+          await pipeline(
+            'automatic-speech-recognition',
+            'onnx-community/whisper-tiny.en',
+            {
+              device: 'wasm'
+            } as any
+          )
+      }
 
       onProgress?.(
         'Loading local vision model…'
       )
 
-      this.vision =
-        await pipeline(
-          'image-to-text',
-          'Xenova/vit-gpt2-image-captioning',
-          {
-            device:
-              'webgpu'
-          } as any
-        )
+      try {
+        this.vision =
+          await pipeline(
+            'image-to-text',
+            'Xenova/vit-gpt2-image-captioning',
+            {
+              device:
+                'webgpu'
+            } as any
+          )
+      } catch {
+        this.vision =
+          await pipeline(
+            'image-to-text',
+            'Xenova/vit-gpt2-image-captioning',
+            {
+              device: 'wasm'
+            } as any
+          )
+      }
 
       onProgress?.(
         'AI models ready'
@@ -134,6 +174,14 @@ export class AIVideoAnalyzer {
       )
     }
 
+    const originalTime =
+      video.currentTime
+
+    const wasPlaying =
+      !video.paused
+
+    video.pause()
+
     onProgress?.(
       'Extracting audio…'
     )
@@ -147,63 +195,70 @@ export class AIVideoAnalyzer {
       'Transcribing speech locally…'
     )
 
-    const transcript =
+    const transcriptResult =
       await this.transcribe(
-        audio,
-        onProgress
+        audio
       )
 
     onProgress?.(
       'Sampling video frames…'
     )
 
-    const frames =
+    const visualFrames =
       await this.extractFrames(
-        video
+        video,
+        onProgress
       )
-
-    const visualDescriptions: string[] =
-      []
-
-    for (
-      let i = 0;
-      i < frames.length;
-      i++
-    ) {
-      onProgress?.(
-        `Understanding frame ${i + 1}/${frames.length}…`
-      )
-
-      const description =
-        await this.describeFrame(
-          frames[i]
-        )
-
-      if (description) {
-        visualDescriptions.push(
-          description
-        )
-      }
-    }
 
     onProgress?.(
       'Inferring the feel…'
     )
 
-    return this.inferFeel(
-      transcript,
-      visualDescriptions
-    )
+    const analysis =
+      this.inferFeel(
+        transcriptResult.text,
+        visualFrames
+      )
+
+    analysis.transcriptSegments =
+      transcriptResult.segments
+
+    analysis.visualFrames =
+      visualFrames
+
+    analysis.visualDescriptions =
+      visualFrames.map(
+        frame =>
+          frame.description
+      )
+
+    video.currentTime =
+      Math.min(
+        originalTime,
+        Math.max(
+          0,
+          video.duration - 0.05
+        )
+      )
+
+    if (wasPlaying) {
+      await video.play()
+    }
+
+    return analysis
   }
 
   private async transcribe(
-    audio: Float32Array,
-    onProgress?: (
-      message: string
-    ) => void
-  ): Promise<string> {
+    audio: Float32Array
+  ): Promise<{
+    text: string
+    segments: TranscriptSegment[]
+  }> {
     if (!this.transcriber) {
-      return ''
+      return {
+        text: '',
+        segments: []
+      }
     }
 
     const result =
@@ -217,80 +272,109 @@ export class AIVideoAnalyzer {
         }
       )
 
-    onProgress?.(
-      'Speech transcription complete'
-    )
+    const text =
+      typeof result ===
+      'object'
+        ? String(
+            result?.text ?? ''
+          ).trim()
+        : ''
 
-    if (
-      typeof result === 'object' &&
-      result &&
-      'text' in result
-    ) {
-      return String(
-        result.text
-      ).trim()
-    }
+    const chunks =
+      Array.isArray(
+        result?.chunks
+      )
+        ? result.chunks
+        : []
 
-    return ''
-  }
+    const segments:
+      TranscriptSegment[] =
+      chunks
+        .map(
+          (chunk: any) => {
+            const timestamp =
+              chunk.timestamp
 
-  private async describeFrame(
-    image: HTMLCanvasElement
-  ): Promise<string> {
-    if (!this.vision) {
-      return ''
-    }
+            if (
+              !Array.isArray(
+                timestamp
+              )
+            ) {
+              return null
+            }
 
-    try {
-      const result =
-        await (this.vision as any)(
-          image,
-          {
-            max_new_tokens: 30
+            const start =
+              Number(
+                timestamp[0]
+              )
+
+            const end =
+              Number(
+                timestamp[1] ??
+                  start + 2
+              )
+
+            if (
+              !Number.isFinite(
+                start
+              )
+            ) {
+              return null
+            }
+
+            return {
+              start,
+              end:
+                Number.isFinite(
+                  end
+                )
+                  ? end
+                  : start + 2,
+              text: String(
+                chunk.text ??
+                  ''
+              ).trim()
+            }
           }
         )
+        .filter(
+          Boolean
+        ) as TranscriptSegment[]
 
-      if (
-        Array.isArray(result) &&
-        result.length > 0
-      ) {
-        return String(
-          result[0]
-            ?.generated_text ?? ''
-        ).trim()
-      }
-
-      return ''
-    } catch (error) {
-      console.warn(
-        'Vision inference failed:',
-        error
-      )
-
-      return ''
+    return {
+      text,
+      segments
     }
   }
 
   private async extractFrames(
-    video: HTMLVideoElement
-  ): Promise<HTMLCanvasElement[]> {
+    video: HTMLVideoElement,
+    onProgress?: (
+      message: string
+    ) => void
+  ): Promise<VisualFrame[]> {
     if (!this.context) {
       throw new Error(
-        'Canvas is unavailable.'
+        'Canvas unavailable.'
       )
     }
 
     const width = 384
     const height = 216
 
-    this.canvas.width = width
-    this.canvas.height = height
+    this.canvas.width =
+      width
+
+    this.canvas.height =
+      height
 
     const duration =
       video.duration
 
     if (
-      !Number.isFinite(duration) ||
+      !Number.isFinite(
+        duration
+      ) ||
       duration <= 0
     ) {
       throw new Error(
@@ -300,25 +384,17 @@ export class AIVideoAnalyzer {
 
     const count =
       Math.min(
-        8,
+        10,
         Math.max(
-          4,
+          5,
           Math.ceil(
-            duration / 5
+            duration / 4
           )
         )
       )
 
     const frames:
-      HTMLCanvasElement[] = []
-
-    const originalTime =
-      video.currentTime
-
-    const wasPlaying =
-      !video.paused
-
-    video.pause()
+      VisualFrame[] = []
 
     for (
       let i = 0;
@@ -353,8 +429,11 @@ export class AIVideoAnalyzer {
           'canvas'
         )
 
-      frame.width = width
-      frame.height = height
+      frame.width =
+        width
+
+      frame.height =
+        height
 
       const frameContext =
         frame.getContext('2d')
@@ -369,29 +448,65 @@ export class AIVideoAnalyzer {
         0
       )
 
-      frames.push(frame)
-    }
-
-    await this.seek(
-      video,
-      Math.min(
-        originalTime,
-        duration - 0.05
+      onProgress?.(
+        `Understanding frame ${i + 1}/${count} at ${time.toFixed(1)}s…`
       )
-    )
 
-    if (wasPlaying) {
-      await video.play()
+      const description =
+        await this.describeFrame(
+          frame
+        )
+
+      frames.push({
+        time,
+        description
+      })
     }
 
     return frames
   }
 
+  private async describeFrame(
+    image: HTMLCanvasElement
+  ): Promise<string> {
+    if (!this.vision) {
+      return ''
+    }
+
+    try {
+      const result =
+        await (this.vision as any)(
+          image,
+          {
+            max_new_tokens: 30
+          }
+        )
+
+      if (
+        Array.isArray(result) &&
+        result.length > 0
+      ) {
+        return String(
+          result[0]
+            ?.generated_text ??
+            ''
+        ).trim()
+      }
+    } catch (error) {
+      console.warn(
+        'Vision inference failed:',
+        error
+      )
+    }
+
+    return ''
+  }
+
   private seek(
     video: HTMLVideoElement,
     time: number
-  ): Promise<void> {
-    return new Promise(
+  ) {
+    return new Promise<void>(
       resolve => {
         const handler = () => {
           video.removeEventListener(
@@ -404,7 +519,10 @@ export class AIVideoAnalyzer {
 
         video.addEventListener(
           'seeked',
-          handler
+          handler,
+          {
+            once: true
+          }
         )
 
         video.currentTime =
@@ -415,15 +533,7 @@ export class AIVideoAnalyzer {
 
   private async extractAudio(
     video: HTMLVideoElement
-  ): Promise<Float32Array> {
-    /*
-     * Browser-safe extraction through
-     * AudioContext + OfflineAudioContext.
-     *
-     * We capture the video's audio
-     * into an AudioBuffer.
-     */
-
+  ) {
     const response =
       await fetch(
         video.src
@@ -444,12 +554,9 @@ export class AIVideoAnalyzer {
       const targetRate =
         16000
 
-      const duration =
-        decoded.duration
-
       const frameCount =
         Math.floor(
-          duration *
+          decoded.duration *
             targetRate
         )
 
@@ -466,13 +573,7 @@ export class AIVideoAnalyzer {
       source.buffer =
         decoded
 
-      const gain =
-        offline.createGain()
-
-      gain.gain.value = 1
-
-      source.connect(gain)
-      gain.connect(
+      source.connect(
         offline.destination
       )
 
@@ -491,8 +592,14 @@ export class AIVideoAnalyzer {
 
   private inferFeel(
     transcript: string,
-    descriptions: string[]
+    frames: VisualFrame[]
   ): AIAnalysis {
+    const descriptions =
+      frames.map(
+        frame =>
+          frame.description
+      )
+
     const text = (
       transcript +
       ' ' +
@@ -514,8 +621,8 @@ export class AIVideoAnalyzer {
 
     const signals = {
       speech:
-        transcript.trim().length >
-        5,
+        transcript.trim()
+          .length > 5,
 
       music: false,
 
@@ -555,15 +662,28 @@ export class AIVideoAnalyzer {
         )
     }
 
-    this.scoreKeywords(
-      scores,
-      text,
+    const add =
+      (
+        category: keyof typeof scores,
+        words: string[],
+        points: number
+      ) => {
+        for (const word of words) {
+          if (
+            text.includes(word)
+          ) {
+            scores[category] +=
+              points
+          }
+        }
+      }
+
+    add(
       'corporate',
       [
         'business',
         'company',
         'enterprise',
-        'startup',
         'office',
         'professional',
         'meeting',
@@ -578,9 +698,7 @@ export class AIVideoAnalyzer {
       5
     )
 
-    this.scoreKeywords(
-      scores,
-      text,
+    add(
       'educational',
       [
         'lesson',
@@ -594,15 +712,12 @@ export class AIVideoAnalyzer {
         'science',
         'diagram',
         'chart',
-        'presentation',
         'how to'
       ],
       6
     )
 
-    this.scoreKeywords(
-      scores,
-      text,
+    add(
       'travel',
       [
         'travel',
@@ -623,17 +738,13 @@ export class AIVideoAnalyzer {
       6
     )
 
-    this.scoreKeywords(
-      scores,
-      text,
+    add(
       'casual',
       [
         'vlog',
         'selfie',
         'friends',
         'fun',
-        'day',
-        'life',
         'guys',
         'story',
         'personal',
@@ -642,9 +753,7 @@ export class AIVideoAnalyzer {
       5
     )
 
-    this.scoreKeywords(
-      scores,
-      text,
+    add(
       'music',
       [
         'concert',
@@ -662,9 +771,7 @@ export class AIVideoAnalyzer {
       7
     )
 
-    this.scoreKeywords(
-      scores,
-      text,
+    add(
       'cinematic',
       [
         'cinematic',
@@ -679,60 +786,70 @@ export class AIVideoAnalyzer {
       4
     )
 
-    if (signals.presentation) {
+    if (
+      signals.presentation
+    ) {
       scores.corporate += 8
-      scores.educational += 4
 
       reasoning.push(
-        'Visual analysis detected presentation/business imagery.'
+        'Presentation/business imagery detected.'
       )
     }
 
-    if (signals.product) {
+    if (
+      signals.product
+    ) {
       scores.corporate += 5
-      scores.educational += 2
 
       reasoning.push(
-        'Visual analysis detected a product or software interface.'
+        'Product or software interface detected.'
       )
     }
 
-    if (signals.outdoor) {
+    if (
+      signals.outdoor
+    ) {
       scores.travel += 5
-      scores.cinematic += 2
 
       reasoning.push(
-        'Visual analysis detected outdoor footage.'
+        'Outdoor footage detected.'
       )
     }
 
-    if (signals.nature) {
+    if (
+      signals.nature
+    ) {
       scores.travel += 5
       scores.cinematic += 5
 
       reasoning.push(
-        'Visual analysis detected nature/landscape imagery.'
+        'Nature/landscape imagery detected.'
       )
     }
 
-    if (signals.city) {
+    if (
+      signals.city
+    ) {
       scores.travel += 4
-      scores.corporate += 2
 
       reasoning.push(
-        'Visual analysis detected urban imagery.'
+        'Urban imagery detected.'
       )
     }
 
-    if (signals.people) {
+    if (
+      signals.people
+    ) {
       scores.casual += 3
 
       reasoning.push(
-        'Visual analysis detected people.'
+        'People detected.'
       )
     }
 
-    if (signals.speech) {
+    if (
+      signals.speech
+    ) {
       scores.educational += 3
       scores.corporate += 2
       scores.casual += 2
@@ -760,21 +877,10 @@ export class AIVideoAnalyzer {
       )
     ) {
       signals.music = true
-
       scores.music += 10
 
       reasoning.push(
-        'Audio/transcript signals suggest music-driven content.'
-      )
-    }
-
-    if (
-      transcript.length > 200
-    ) {
-      scores.educational += 3
-
-      reasoning.push(
-        'Long-form speech suggests explanation or educational content.'
+        'Music-related signals detected.'
       )
     }
 
@@ -795,15 +901,19 @@ export class AIVideoAnalyzer {
         scores[key] >
         bestScore
       ) {
-        best = key
         bestScore =
           scores[key]
+
+        best = key
       }
     }
 
     const total =
-      Object.values(scores).reduce(
-        (a, b) => a + b,
+      Object.values(
+        scores
+      ).reduce(
+        (a, b) =>
+          a + b,
         0
       )
 
@@ -813,7 +923,8 @@ export class AIVideoAnalyzer {
             0.98,
             Math.max(
               0.4,
-              bestScore / total
+              bestScore /
+                total
             )
           )
         : 0.4
@@ -822,14 +933,19 @@ export class AIVideoAnalyzer {
       reasoning.length === 0
     ) {
       reasoning.push(
-        'AI could not find a dominant semantic signal.'
+        'No dominant semantic signal detected.'
       )
     }
 
     return {
       transcript,
+
+      transcriptSegments: [],
+
       visualDescriptions:
         descriptions,
+
+      visualFrames: frames,
 
       feel: best,
 
@@ -841,25 +957,11 @@ export class AIVideoAnalyzer {
     }
   }
 
-  private scoreKeywords(
-    scores: Record<
-      string,
-      number
-    >,
-    text: string,
-    category: string,
-    keywords: string[],
-    points: number
-  ) {
-    for (
-      const keyword of keywords
-    ) {
-      if (
-        text.includes(keyword)
-      ) {
-        scores[category] +=
-          points
-      }
-    }
+  destroy() {
+    this.transcriber =
+      null
+
+    this.vision =
+      null
   }
 }

@@ -12,15 +12,9 @@ body,
 
 body {
   overflow: hidden;
-
   background: #050505;
-
   color: white;
-
-  font-family:
-    Inter,
-    Arial,
-    sans-serif;
+  font-family: Inter, Arial, sans-serif;
 }
 
 button,
@@ -31,10 +25,8 @@ textarea {
 .app {
   width: 100%;
   height: 100%;
-
   display: flex;
   flex-direction: column;
-
   background:
     radial-gradient(
       circle at 50% 20%,
@@ -46,7 +38,6 @@ textarea {
 
 .header {
   height: 70px;
-
   flex-shrink: 0;
 
   display: flex;
@@ -57,16 +48,15 @@ textarea {
 
   border-bottom:
     1px solid
-    rgba(255,255,255,.08);
+    rgba(255, 255, 255, .08);
 
   background:
-    rgba(5,5,5,.85);
+    rgba(5, 5, 5, .85);
 }
 
 .brand {
   font-size: 24px;
   font-weight: 900;
-
   letter-spacing: -.06em;
 }
 
@@ -77,40 +67,31 @@ textarea {
 .engine-status {
   display: flex;
   align-items: center;
-
   gap: 8px;
 
   color:
     rgba(255,255,255,.4);
 
   font-size: 9px;
-
   font-weight: 800;
-
   letter-spacing: .14em;
 }
 
 .status-dot {
   width: 6px;
   height: 6px;
-
   border-radius: 50%;
-
   background: white;
-
-  box-shadow:
-    0 0 12px white;
+  box-shadow: 0 0 12px white;
 }
 
 .workspace {
   flex: 1;
-
   min-height: 0;
 
   display: grid;
-
   grid-template-columns:
-    minmax(0,1fr)
+    minmax(0, 1fr)
     360px;
 
   gap: 1px;
@@ -121,40 +102,31 @@ textarea {
 
 .video-panel {
   position: relative;
-
   min-width: 0;
   min-height: 0;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
   background: #090909;
-
   overflow: hidden;
 }
 
 #video {
   display: block;
-
   width: 100%;
   height: 100%;
-
   object-fit: contain;
-
   background: #050505;
 }
 
 .video-placeholder {
   position: absolute;
-
   inset: 0;
 
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
   justify-content: center;
 
@@ -166,9 +138,7 @@ textarea {
     rgba(255,255,255,.4);
 
   font-size: 11px;
-
   font-weight: 800;
-
   letter-spacing: .12em;
 }
 
@@ -177,9 +147,7 @@ textarea {
     rgba(255,255,255,.2);
 
   font-size: 9px;
-
   font-weight: 400;
-
   letter-spacing: 0;
 }
 
@@ -190,10 +158,8 @@ textarea {
 
 .upload-button {
   position: absolute;
-
   top: 18px;
   left: 18px;
-
   z-index: 2;
 
   padding: 9px 14px;
@@ -211,17 +177,10 @@ textarea {
     rgba(0,0,0,.7);
 
   font-size: 9px;
-
   font-weight: 800;
-
   letter-spacing: .1em;
 
   cursor: pointer;
-}
-
-.upload-button:hover {
-  background:
-    rgba(255,255,255,.12);
 }
 
 .analysis-panel {
@@ -234,14 +193,13 @@ textarea {
   background: #080808;
 }
 
-.panel-title {
+.panel-title,
+.small-label {
   color:
     rgba(255,255,255,.3);
 
-  font-size: 9px;
-
+  font-size: 8px;
   font-weight: 800;
-
   letter-spacing: .15em;
 }
 
@@ -255,24 +213,11 @@ textarea {
     rgba(255,255,255,.08);
 }
 
-.small-label {
-  color:
-    rgba(255,255,255,.3);
-
-  font-size: 8px;
-
-  font-weight: 800;
-
-  letter-spacing: .15em;
-}
-
 .feel {
   margin-top: 8px;
 
   font-size: 32px;
-
   font-weight: 900;
-
   line-height: 1;
 
   letter-spacing: -.06em;
@@ -318,15 +263,12 @@ textarea {
 
   background: white;
 
-  transition:
-    width .3s ease;
+  transition: width .3s ease;
 }
 
 .metrics {
   display: grid;
-
-  grid-template-columns:
-    1fr 1fr;
+  grid-template-columns: 1fr 1fr;
 
   gap: 1px;
 
@@ -339,7 +281,6 @@ textarea {
 
 .metric {
   padding: 13px;
-
   background:
     rgba(255,255,255,.025);
 }
@@ -351,7 +292,6 @@ textarea {
     rgba(255,255,255,.3);
 
   font-size: 8px;
-
   letter-spacing: .12em;
 }
 
@@ -376,7 +316,6 @@ textarea {
     rgba(255,255,255,.55);
 
   font-size: 10px;
-
   line-height: 1.8;
 }
 
@@ -393,7 +332,6 @@ textarea {
   height: 90px;
 
   margin-top: 9px;
-
   padding: 10px;
 
   resize: none;
@@ -412,20 +350,13 @@ textarea {
     rgba(255,255,255,.035);
 
   font-size: 9px;
-
   line-height: 1.5;
-}
-
-.transcript textarea::placeholder {
-  color:
-    rgba(255,255,255,.2);
 }
 
 .analyze-button {
   width: 100%;
 
   margin-top: 16px;
-
   padding: 14px;
 
   border:
@@ -440,28 +371,19 @@ textarea {
     rgba(255,255,255,.08);
 
   font-size: 10px;
-
   font-weight: 800;
-
   letter-spacing: .12em;
 
   cursor: pointer;
 }
 
-.analyze-button:hover:not(:disabled) {
-  background:
-    rgba(255,255,255,.14);
-}
-
 .analyze-button:disabled {
   opacity: .4;
-
   cursor: not-allowed;
 }
 
 .output-panel {
-  height: 200px;
-
+  height: 260px;
   flex-shrink: 0;
 
   padding: 18px 28px;
@@ -477,7 +399,6 @@ textarea {
 
 .output-header {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
 }
@@ -504,44 +425,113 @@ textarea {
     rgba(255,255,255,.45);
 
   font-size: 8px;
-
   font-weight: 800;
-
   letter-spacing: .1em;
 }
 
-.output-grid {
+.events-layout {
+  height: 190px;
+
   display: grid;
 
   grid-template-columns:
     1fr 1fr;
 
-  gap: 30px;
+  gap: 24px;
 
   margin-top: 14px;
 }
 
-.visual {
-  max-height: 105px;
-
-  margin-top: 8px;
+.events {
+  height: 180px;
 
   overflow-y: auto;
 
+  padding-right: 8px;
+}
+
+.event {
+  display: flex;
+
+  gap: 12px;
+
+  padding: 8px 0;
+
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.05);
+}
+
+.event-time {
+  width: 44px;
+  flex-shrink: 0;
+
   color:
-    rgba(255,255,255,.45);
+    rgba(255,255,255,.3);
+
+  font-family:
+    Consolas,
+    monospace;
+
+  font-size: 8px;
+}
+
+.event-main {
+  min-width: 0;
+}
+
+.event-type {
+  color:
+    rgba(255,255,255,.35);
+
+  font-size: 7px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: .12em;
+}
+
+.event-text {
+  margin-top: 3px;
+
+  color:
+    rgba(255,255,255,.65);
 
   font-size: 9px;
 
-  line-height: 1.6;
+  line-height: 1.4;
+}
+
+.event-motion {
+  margin-top: 3px;
+
+  color:
+    rgba(255,255,255,.3);
+
+  font-size: 7px;
+
+  font-family:
+    Consolas,
+    monospace;
+}
+
+.event-empty {
+  padding-top: 20px;
+
+  color:
+    rgba(255,255,255,.2);
+
+  font-size: 9px;
 }
 
 #dsl {
-  height: 110px;
+  height: 180px;
 
   margin: 0;
 
-  overflow: hidden;
+  overflow: auto;
 
   color:
     rgba(255,255,255,.4);
@@ -552,7 +542,7 @@ textarea {
 
   font-size: 8px;
 
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 @media (max-width: 850px) {

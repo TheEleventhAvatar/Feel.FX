@@ -5,6 +5,11 @@ import {
   type AIAnalysis
 } from './aiVideoAnalyzer'
 
+import {
+  generateEvents,
+  type MotionDSL
+} from './eventEngine'
+
 const app =
   document.querySelector<HTMLDivElement>(
     '#app'
@@ -41,11 +46,7 @@ app.innerHTML = `
           class="video-placeholder"
         >
           <div class="upload-icon">＋</div>
-
-          <div>
-            DROP A VIDEO
-          </div>
-
+          <div>DROP A VIDEO</div>
           <small>
             FeelFX will watch it locally
           </small>
@@ -104,10 +105,7 @@ app.innerHTML = `
             LOAD A VIDEO
           </div>
 
-          <div
-            id="stage-progress"
-            class="progress"
-          >
+          <div class="progress">
             <div
               id="progress-bar"
             ></div>
@@ -183,9 +181,8 @@ app.innerHTML = `
       <div class="output-header">
 
         <div>
-
           <div class="small-label">
-            AI MOTION DECISION
+            TIMESTAMPED MOTION INTELLIGENCE
           </div>
 
           <div
@@ -194,7 +191,6 @@ app.innerHTML = `
           >
             Waiting for AI analysis
           </div>
-
         </div>
 
         <div
@@ -206,21 +202,15 @@ app.innerHTML = `
 
       </div>
 
-      <div class="output-grid">
+      <div class="events-layout">
 
-        <div>
-
-          <div class="small-label">
-            VISUAL UNDERSTANDING
+        <div
+          id="events"
+          class="events"
+        >
+          <div class="event-empty">
+            No events yet
           </div>
-
-          <div
-            id="visual"
-            class="visual"
-          >
-            —
-          </div>
-
         </div>
 
         <pre id="dsl">{
@@ -309,9 +299,9 @@ const transcript =
     '#transcript'
   )!
 
-const visual =
+const events =
   document.querySelector<HTMLDivElement>(
-    '#visual'
+    '#events'
   )!
 
 const dsl =
@@ -329,7 +319,8 @@ const status =
     '#status'
   )!
 
-let videoURL: string | null = null
+let videoURL:
+  string | null = null
 
 const ai =
   new AIVideoAnalyzer()
@@ -347,9 +338,7 @@ fileInput.addEventListener(
     const file =
       fileInput.files?.[0]
 
-    if (!file) {
-      return
-    }
+    if (!file) return
 
     if (videoURL) {
       URL.revokeObjectURL(
@@ -358,7 +347,9 @@ fileInput.addEventListener(
     }
 
     videoURL =
-      URL.createObjectURL(file)
+      URL.createObjectURL(
+        file
+      )
 
     video.pause()
 
@@ -370,7 +361,8 @@ fileInput.addEventListener(
     placeholder.style.display =
       'none'
 
-    feelButton.disabled = false
+    feelButton.disabled =
+      false
 
     stage.textContent =
       'VIDEO READY'
@@ -383,6 +375,16 @@ fileInput.addEventListener(
 
     summary.textContent =
       `${file.name} · Ready for local AI`
+
+    events.innerHTML = `
+      <div class="event-empty">
+        Ready for timestamped analysis
+      </div>
+    `
+
+    dsl.textContent = `{
+  "status": "video-loaded"
+}`
   }
 )
 
@@ -403,265 +405,127 @@ function updateProgress(
     )}%`
 }
 
-function yesNo(
-  value: boolean
-) {
-  return value
-    ? 'YES'
-    : 'NO'
-}
-
-function createMotionDSL(
+function renderEvents(
   analysis: AIAnalysis
 ) {
-  const base = {
-    generatedBy:
-      'FeelFX AI',
-    feel: analysis.feel,
-    confidence:
-      analysis.confidence
-  }
+  const generated =
+    generateEvents(
+      analysis
+    )
 
-  switch (
-    analysis.feel
-  ) {
-    case 'corporate':
-      return {
-        ...base,
-        style: {
-          typography:
-            'clean',
-          movement:
-            'precise',
-          pacing:
-            'measured'
-        },
-        elements: [
-          {
-            type: 'text',
-            action: 'reveal',
-            text:
-              'KEY INSIGHT',
-            animation:
-              'masked-slide-up'
-          },
-          {
-            type: 'highlight',
-            action:
-              'emphasize',
-            animation:
-              'draw'
-          },
-          {
-            type: 'arrow',
-            action:
-              'connect',
-            animation:
-              'smooth'
-          }
-        ]
-      }
+  events.innerHTML =
+    generated.length === 0
+      ? `
+        <div class="event-empty">
+          No semantic events detected
+        </div>
+      `
+      : generated
+          .slice(0, 14)
+          .map(
+            (
+              event: (typeof generated)[number]
+            ) => `
+              <div class="event">
 
-    case 'educational':
-      return {
-        ...base,
-        style: {
-          typography:
-            'clear',
-          movement:
-            'explanatory',
-          pacing:
-            'structured'
-        },
-        elements: [
-          {
-            type: 'text',
-            action: 'label',
-            animation:
-              'fade-up'
-          },
-          {
-            type: 'circle',
-            action:
-              'focus',
-            animation:
-              'draw'
-          },
-          {
-            type: 'arrow',
-            action:
-              'explain',
-            animation:
-              'spring'
-          }
-        ]
-      }
+                <div class="event-time">
+                  ${formatTime(
+                    event.time
+                  )}
+                </div>
 
-    case 'travel':
-      return {
-        ...base,
-        style: {
-          typography:
-            'editorial',
-          movement:
-            'fluid',
-          pacing:
-            'relaxed'
-        },
-        elements: [
-          {
-            type: 'text',
-            action: 'location',
-            animation:
-              'drift-up'
-          },
-          {
-            type: 'line',
-            action:
-              'trace-route',
-            animation:
-              'draw'
-          },
-          {
-            type: 'circle',
-            action:
-              'location-pin',
-            animation:
-              'pop'
-          }
-        ]
-      }
+                <div class="event-main">
 
-    case 'music':
-      return {
-        ...base,
-        style: {
-          typography:
-            'bold',
-          movement:
-            'rhythmic',
-          pacing:
-            'beat-synced'
-        },
-        elements: [
-          {
-            type: 'text',
-            action:
-              'beat-hit',
-            animation:
-              'slam'
-          },
-          {
-            type: 'circle',
-            action:
-              'pulse',
-            animation:
-              'rhythmic'
-          },
-          {
-            type: 'camera',
-            action:
-              'punch-in',
-            animation:
-              'beat'
-          }
-        ]
-      }
+                  <div class="event-type">
+                    ${event.type}
+                  </div>
 
-    case 'casual':
-      return {
-        ...base,
-        style: {
-          typography:
-            'playful',
-          movement:
-            'organic',
-          pacing:
-            'fast'
-        },
-        elements: [
-          {
-            type: 'text',
-            action:
-              'reaction',
-            animation:
-              'pop'
-          },
-          {
-            type: 'sticker',
-            action:
-              'appear',
-            animation:
-              'bounce'
-          }
-        ]
-      }
+                  <div class="event-text">
+                    ${escapeHTML(
+                      event.event
+                    )}
+                  </div>
 
-    case 'energetic':
-      return {
-        ...base,
-        style: {
-          typography:
-            'impact',
-          movement:
-            'aggressive',
-          pacing:
-            'fast'
-        },
-        elements: [
-          {
-            type: 'text',
-            action:
-              'impact',
-            animation:
-              'slam'
-          },
-          {
-            type: 'camera',
-            action:
-              'punch',
-            animation:
-              'rapid'
-          },
-          {
-            type: 'shape',
-            action:
-              'burst',
-            animation:
-              'explode'
-          }
-        ]
-      }
+                  <div class="event-motion">
+                    → ${event.motion.type}
+                    · ${event.motion.animation}
+                  </div>
 
-    default:
-      return {
-        ...base,
-        style: {
-          typography:
-            'cinematic',
-          movement:
-            'fluid',
-          pacing:
-            'dramatic'
-        },
-        elements: [
-          {
-            type: 'text',
-            action:
-              'title',
-            animation:
-              'cinematic-fade'
-          },
-          {
-            type: 'camera',
-            action:
-              'slow-push',
-            animation:
-              'smooth'
-          }
-        ]
-      }
-  }
+                </div>
+
+              </div>
+            `
+          )
+          .join('')
+
+  const motionDSL:
+    MotionDSL = {
+      generatedBy:
+        'FeelFX AI',
+
+      feel:
+        analysis.feel,
+
+      events:
+        generated
+    }
+
+  dsl.textContent =
+    JSON.stringify(
+      motionDSL,
+      null,
+      2
+    )
+
+  summary.textContent =
+    `${analysis.feel} → ${generated.length} timestamped motion events`
+
+  status.textContent =
+    'GENERATED'
+}
+
+function formatTime(
+  seconds: number
+) {
+  const minutes =
+    Math.floor(
+      seconds / 60
+    )
+
+  const remaining =
+    seconds % 60
+
+  return `${String(
+    minutes
+  ).padStart(2, '0')}:${remaining
+    .toFixed(1)
+    .padStart(4, '0')}`
+}
+
+function escapeHTML(
+  value: string
+) {
+  return value
+    .replace(
+      /&/g,
+      '&amp;'
+    )
+    .replace(
+      /</g,
+      '&lt;'
+    )
+    .replace(
+      />/g,
+      '&gt;'
+    )
+    .replace(
+      /"/g,
+      '&quot;'
+    )
+    .replace(
+      /'/g,
+      '&#039;'
+    )
 }
 
 function renderAnalysis(
@@ -676,24 +540,24 @@ function renderAnalysis(
     )}% confidence`
 
   speech.textContent =
-    yesNo(
-      analysis.signals.speech
-    )
+    analysis.signals.speech
+      ? 'YES'
+      : 'NO'
 
   people.textContent =
-    yesNo(
-      analysis.signals.people
-    )
+    analysis.signals.people
+      ? 'YES'
+      : 'NO'
 
   outdoor.textContent =
-    yesNo(
-      analysis.signals.outdoor
-    )
+    analysis.signals.outdoor
+      ? 'YES'
+      : 'NO'
 
   product.textContent =
-    yesNo(
-      analysis.signals.product
-    )
+    analysis.signals.product
+      ? 'YES'
+      : 'NO'
 
   transcript.value =
     analysis.transcript ||
@@ -707,37 +571,16 @@ function renderAnalysis(
       )
       .join('')
 
-  visual.innerHTML =
-    analysis.visualDescriptions
-      .map(
-        description =>
-          `<div>• ${description}</div>`
-      )
-      .join('')
-
-  const motionDSL =
-    createMotionDSL(
-      analysis
-    )
-
-  dsl.textContent =
-    JSON.stringify(
-      motionDSL,
-      null,
-      2
-    )
-
-  summary.textContent =
-    `${analysis.feel} → ${motionDSL.elements.length} motion decisions`
-
-  status.textContent =
-    'GENERATED'
+  renderEvents(
+    analysis
+  )
 }
 
 feelButton.addEventListener(
   'click',
   async () => {
-    feelButton.disabled = true
+    feelButton.disabled =
+      true
 
     status.textContent =
       'ANALYZING'
@@ -753,7 +596,9 @@ feelButton.addEventListener(
         await ai.analyze(
           video,
           message => {
-            setStage(message)
+            setStage(
+              message
+            )
 
             if (
               message.includes(
@@ -791,15 +636,6 @@ feelButton.addEventListener(
               )
             ) {
               updateProgress(90)
-            } else if (
-              message.includes(
-                'complete'
-              ) ||
-              message.includes(
-                'ready'
-              )
-            ) {
-              updateProgress(35)
             }
           }
         )
@@ -825,24 +661,11 @@ feelButton.addEventListener(
       setStage(
         error instanceof Error
           ? error.message
-          : 'AI analysis failed'
+          : 'Analysis failed'
       )
-
-      dsl.textContent =
-        JSON.stringify(
-          {
-            status:
-              'error',
-            message:
-              error instanceof Error
-                ? error.message
-                : String(error)
-          },
-          null,
-          2
-        )
     }
 
-    feelButton.disabled = false
+    feelButton.disabled =
+      false
   }
-)
+) 
