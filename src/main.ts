@@ -6,14 +6,13 @@ import {
 } from './aiVideoAnalyzer'
 
 import {
-  generateEvents,
-  type MotionDSL
+  generateEvents
 } from './eventEngine'
 
+import { MotionRenderer } from './motionrenderer'
+
 const app =
-  document.querySelector<HTMLDivElement>(
-    '#app'
-  )!
+  document.querySelector<HTMLDivElement>('#app')!
 
 app.innerHTML = `
   <div class="app">
@@ -51,6 +50,15 @@ app.innerHTML = `
             FeelFX will watch it locally
           </small>
         </div>
+
+        <!--
+          Motion graphics are rendered here.
+          This layer sits above the video.
+        -->
+        <div
+          id="motion-layer"
+          class="motion-layer"
+        ></div>
 
         <input
           id="file"
@@ -106,9 +114,7 @@ app.innerHTML = `
           </div>
 
           <div class="progress">
-            <div
-              id="progress-bar"
-            ></div>
+            <div id="progress-bar"></div>
           </div>
 
         </div>
@@ -181,8 +187,9 @@ app.innerHTML = `
       <div class="output-header">
 
         <div>
+
           <div class="small-label">
-            TIMESTAMPED MOTION INTELLIGENCE
+            LIVE MOTION GRAPHICS
           </div>
 
           <div
@@ -191,6 +198,7 @@ app.innerHTML = `
           >
             Waiting for AI analysis
           </div>
+
         </div>
 
         <div
@@ -223,6 +231,10 @@ app.innerHTML = `
 
   </div>
 `
+
+/* --------------------------------------------------
+ * DOM
+ * -------------------------------------------------- */
 
 const video =
   document.querySelector<HTMLVideoElement>(
@@ -319,11 +331,31 @@ const status =
     '#status'
   )!
 
-let videoURL:
-  string | null = null
+const motionLayer =
+  document.querySelector<HTMLDivElement>(
+    '#motion-layer'
+  )!
+
+/* --------------------------------------------------
+ * STATE
+ * -------------------------------------------------- */
+
+let videoURL: string | null = null
+
+let currentEvents:
+  ReturnType<typeof generateEvents> = []
 
 const ai =
   new AIVideoAnalyzer()
+
+const motionRenderer =
+  new MotionRenderer(
+    motionLayer
+  )
+
+/* --------------------------------------------------
+ * LOAD VIDEO
+ * -------------------------------------------------- */
 
 loadButton.addEventListener(
   'click',
@@ -338,7 +370,9 @@ fileInput.addEventListener(
     const file =
       fileInput.files?.[0]
 
-    if (!file) return
+    if (!file) {
+      return
+    }
 
     if (videoURL) {
       URL.revokeObjectURL(
@@ -385,8 +419,107 @@ fileInput.addEventListener(
     dsl.textContent = `{
   "status": "video-loaded"
 }`
+
+    currentEvents = []
+
+    motionRenderer.setEvents(
+      []
+    )
   }
 )
+
+/* --------------------------------------------------
+ * VIDEO TIME → MOTION ENGINE
+ * -------------------------------------------------- */
+
+video.addEventListener(
+  'timeupdate',
+  () => {
+    const time =
+      video.currentTime
+
+    motionRenderer.updateVideoTime(
+      time
+    )
+
+    updateActiveEvent(
+      time
+    )
+  }
+)
+
+video.addEventListener(
+  'seeked',
+  () => {
+    motionRenderer.updateVideoTime(
+      video.currentTime
+    )
+
+    updateActiveEvent(
+      video.currentTime
+    )
+  }
+)
+
+/* --------------------------------------------------
+ * ACTIVE EVENT UI
+ * -------------------------------------------------- */
+
+function updateActiveEvent(
+  time: number
+) {
+  if (
+    currentEvents.length === 0
+  ) {
+    return
+  }
+
+  const active =
+    currentEvents.find(
+      event =>
+        time >= event.time &&
+        time <= event.endTime
+    )
+
+  document
+    .querySelectorAll(
+      '.event'
+    )
+    .forEach(
+      element => {
+        element.classList.remove(
+          'event-active'
+        )
+      }
+    )
+
+  if (!active) {
+    return
+  }
+
+  const index =
+    currentEvents.indexOf(
+      active
+    )
+
+  const elements =
+    document.querySelectorAll(
+      '.event'
+    )
+
+  elements[
+    Math.min(
+      index,
+      elements.length - 1
+    )
+  ]?.classList.add(
+    'event-active'
+  )
+}
+
+/* --------------------------------------------------
+ * UI HELPERS
+ * -------------------------------------------------- */
 
 function setStage(
   message: string
@@ -401,9 +534,16 @@ function updateProgress(
   progress.style.width =
     `${Math.max(
       0,
-      Math.min(100, value)
+      Math.min(
+        100,
+        value
+      )
     )}%`
 }
+
+/* --------------------------------------------------
+ * RENDER AI EVENTS
+ * -------------------------------------------------- */
 
 function renderEvents(
   analysis: AIAnalysis
@@ -413,19 +553,54 @@ function renderEvents(
       analysis
     )
 
+  currentEvents =
+    generated
+
+  /*
+   * IMPORTANT:
+   *
+   * The events are passed directly
+   * to the visual motion renderer.
+   *
+   * MotionRenderer decides what actual
+   * graphics to render:
+   *
+   * beach
+   *    → water/splash/particles
+   *
+   * rocket
+   *    → fire/exhaust/shockwave
+   *
+   * flag
+   *    → tricolor ribbons/particles
+   *
+   * celebration
+   *    → bursts/confetti
+   *
+   * product
+   *    → tracking/highlight graphics
+   *
+   * etc.
+   */
+  motionRenderer.setEvents(
+    generated
+  )
+
+  /*
+   * Event list in the UI.
+   */
+
   events.innerHTML =
     generated.length === 0
       ? `
         <div class="event-empty">
-          No semantic events detected
+          No visual events detected
         </div>
       `
       : generated
-          .slice(0, 14)
+          .slice(0, 30)
           .map(
-            (
-              event: (typeof generated)[number]
-            ) => `
+            event => `
               <div class="event">
 
                 <div class="event-time">
@@ -437,7 +612,11 @@ function renderEvents(
                 <div class="event-main">
 
                   <div class="event-type">
-                    ${event.type}
+                    ${escapeHTML(
+                      String(
+                        event.type
+                      )
+                    )}
                   </div>
 
                   <div class="event-text">
@@ -447,8 +626,12 @@ function renderEvents(
                   </div>
 
                   <div class="event-motion">
-                    → ${event.motion.type}
-                    · ${event.motion.animation}
+                    → ${
+                      event.motion.type
+                    }
+                    · ${
+                      event.motion.animation
+                    }
                   </div>
 
                 </div>
@@ -458,31 +641,39 @@ function renderEvents(
           )
           .join('')
 
-  const motionDSL:
-    MotionDSL = {
-      generatedBy:
-        'FeelFX AI',
-
-      feel:
-        analysis.feel,
-
-      events:
-        generated
-    }
+  /*
+   * DSL/debug representation.
+   */
 
   dsl.textContent =
     JSON.stringify(
-      motionDSL,
+      {
+        generatedBy:
+          'FeelFX AI',
+
+        feel:
+          analysis.feel,
+
+        confidence:
+          analysis.confidence,
+
+        events:
+          generated
+      },
       null,
       2
     )
 
   summary.textContent =
-    `${analysis.feel} → ${generated.length} timestamped motion events`
+    `${analysis.feel} → ${generated.length} visual motion decisions`
 
   status.textContent =
     'GENERATED'
 }
+
+/* --------------------------------------------------
+ * FORMAT TIME
+ * -------------------------------------------------- */
 
 function formatTime(
   seconds: number
@@ -497,10 +688,20 @@ function formatTime(
 
   return `${String(
     minutes
-  ).padStart(2, '0')}:${remaining
+  ).padStart(
+    2,
+    '0'
+  )}:${remaining
     .toFixed(1)
-    .padStart(4, '0')}`
+    .padStart(
+      4,
+      '0'
+    )}`
 }
+
+/* --------------------------------------------------
+ * HTML ESCAPE
+ * -------------------------------------------------- */
 
 function escapeHTML(
   value: string
@@ -527,6 +728,10 @@ function escapeHTML(
       '&#039;'
     )
 }
+
+/* --------------------------------------------------
+ * RENDER ANALYSIS
+ * -------------------------------------------------- */
 
 function renderAnalysis(
   analysis: AIAnalysis
@@ -567,7 +772,9 @@ function renderAnalysis(
     analysis.reasoning
       .map(
         item =>
-          `<div>• ${item}</div>`
+          `<div>• ${escapeHTML(
+            item
+          )}</div>`
       )
       .join('')
 
@@ -576,9 +783,14 @@ function renderAnalysis(
   )
 }
 
+/* --------------------------------------------------
+ * FEEL THE VIDEO
+ * -------------------------------------------------- */
+
 feelButton.addEventListener(
   'click',
   async () => {
+
     feelButton.disabled =
       true
 
@@ -589,67 +801,123 @@ feelButton.addEventListener(
       'Starting local AI…'
     )
 
-    updateProgress(5)
+    updateProgress(
+      5
+    )
+
+    currentEvents = []
+
+    motionRenderer.setEvents(
+      []
+    )
 
     try {
+
       const analysis =
         await ai.analyze(
           video,
           message => {
+
             setStage(
               message
             )
 
+            const lower =
+              message.toLowerCase()
+
             if (
-              message.includes(
+              lower.includes(
                 'speech model'
               )
             ) {
-              updateProgress(15)
-            } else if (
-              message.includes(
+              updateProgress(
+                15
+              )
+            }
+
+            else if (
+              lower.includes(
                 'vision model'
               )
             ) {
-              updateProgress(30)
-            } else if (
-              message.includes(
+              updateProgress(
+                30
+              )
+            }
+
+            else if (
+              lower.includes(
                 'audio'
               )
             ) {
-              updateProgress(45)
-            } else if (
-              message.includes(
-                'Transcribing'
+              updateProgress(
+                45
+              )
+            }
+
+            else if (
+              lower.includes(
+                'transcrib'
               )
             ) {
-              updateProgress(60)
-            } else if (
-              message.includes(
+              updateProgress(
+                60
+              )
+            }
+
+            else if (
+              lower.includes(
                 'frame'
               )
             ) {
-              updateProgress(75)
-            } else if (
-              message.includes(
+              updateProgress(
+                75
+              )
+            }
+
+            else if (
+              lower.includes(
                 'feel'
               )
             ) {
-              updateProgress(90)
+              updateProgress(
+                90
+              )
             }
           }
         )
 
-      updateProgress(100)
+      updateProgress(
+        100
+      )
 
       renderAnalysis(
         analysis
       )
 
       setStage(
-        'AI understanding complete'
+        'AI understanding complete · Motion graphics ready'
       )
-    } catch (error) {
+
+      video.currentTime =
+        0
+
+      /*
+       * Render the first frame
+       * immediately instead of waiting
+       * for the first timeupdate event.
+       */
+      motionRenderer.updateVideoTime(
+        0
+      )
+
+      status.textContent =
+        'LIVE'
+
+    } catch (
+      error
+    ) {
+
       console.error(
         'FeelFX AI error:',
         error
@@ -663,9 +931,31 @@ feelButton.addEventListener(
           ? error.message
           : 'Analysis failed'
       )
-    }
 
-    feelButton.disabled =
-      false
+    } finally {
+
+      feelButton.disabled =
+        false
+    }
   }
-) 
+)
+
+/* --------------------------------------------------
+ * CLEANUP
+ * -------------------------------------------------- */
+
+window.addEventListener(
+  'beforeunload',
+  () => {
+
+    ai.destroy()
+
+    motionRenderer.destroy()
+
+    if (videoURL) {
+      URL.revokeObjectURL(
+        videoURL
+      )
+    }
+  }
+)
