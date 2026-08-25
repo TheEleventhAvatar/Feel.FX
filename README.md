@@ -36,7 +36,6 @@ For example:
 | 🚀 Rocket launch         | Explosive launch trails, impact pulses, energetic typography |
 | 🏖️ Beach                | Water/splash effects, fluid motion, atmospheric graphics     |
 | 🇮🇳 India / Indian flag | Tricolor typography and visual accents                       |
-| 🛰️ Rocket name          | Cinematic keyword reveal                                     |
 | ✈️ Travel                | Route lines, location pins, fluid transitions                |
 | 🎵 Music                 | Beat-driven, energetic motion                                |
 | 💼 Corporate             | Clean, restrained, professional graphics                     |
