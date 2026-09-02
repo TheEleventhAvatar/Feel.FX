@@ -95,6 +95,11 @@ export class FeelFX {
   private activeParticles: ParticleSystem[] = []
   private timelines: gsap.core.Timeline[] = []
 
+  private ready = true
+
+  private viewWidth = 1
+  private viewHeight = 1
+
   constructor(container: HTMLElement) {
     this.container = container
 
@@ -102,6 +107,9 @@ export class FeelFX {
 
     const width = Math.max(container.clientWidth, 1)
     const height = Math.max(container.clientHeight, 1)
+
+    this.viewWidth = width
+    this.viewHeight = height
 
     this.camera = new THREE.OrthographicCamera(
       -width / 2,
@@ -517,8 +525,42 @@ export class FeelFX {
   }
 
   playSequence(instructions: MotionInstruction[]) {
+    let offset = 0
+
     instructions.forEach(instruction => {
-      this.play(instruction)
+      gsap.delayedCall(offset, () => this.play(instruction))
+
+      offset += instruction.duration ?? 1
+    })
+  }
+
+  // --------------------------------------------------
+  // DISPOSE
+  // --------------------------------------------------
+
+  private disposeObject(object: THREE.Object3D) {
+    object.traverse(child => {
+      const mesh = child as THREE.Mesh
+
+      if (mesh.geometry) {
+        mesh.geometry.dispose()
+      }
+
+      const materials = Array.isArray(mesh.material)
+        ? mesh.material
+        : [mesh.material]
+
+      materials.forEach(material => {
+        if (!(material instanceof THREE.Material)) return
+
+        material.dispose()
+
+        const map = (material as THREE.MeshBasicMaterial).map
+
+        if (map) {
+          map.dispose()
+        }
+      })
     })
   }
 
@@ -584,12 +626,7 @@ export class FeelFX {
       gsap.to(material, {
         opacity: 0,
         duration: 0.5,
-        delay: 0.7,
-        onComplete: () => {
-          geometry.dispose()
-          material.dispose()
-          group.remove(drop)
-        }
+        delay: 0.7
       })
     }
 
@@ -597,7 +634,10 @@ export class FeelFX {
 
     gsap.delayedCall(
       instruction.duration ?? 2,
-      () => this.scene.remove(group)
+      () => {
+        this.scene.remove(group)
+        this.disposeObject(group)
+      }
     )
   }
 
@@ -664,7 +704,11 @@ export class FeelFX {
       () => {
         gsap.to(group.children, {
           opacity: 0,
-          duration: 0.5
+          duration: 0.5,
+          onComplete: () => {
+            this.scene.remove(group)
+            this.disposeObject(group)
+          }
         })
       }
     )
@@ -751,16 +795,7 @@ export class FeelFX {
       instruction.duration ?? 2,
       () => {
         this.scene.remove(group)
-
-        group.children.forEach(object => {
-          const mesh = object as THREE.Mesh
-          mesh.geometry.dispose()
-
-          const material =
-            mesh.material as THREE.MeshBasicMaterial
-
-          material.dispose()
-        })
+        this.disposeObject(group)
       }
     )
   }
@@ -833,7 +868,10 @@ export class FeelFX {
 
     gsap.delayedCall(
       instruction.duration ?? 1.2,
-      () => this.scene.remove(group)
+      () => {
+        this.scene.remove(group)
+        this.disposeObject(group)
+      }
     )
   }
 
@@ -891,8 +929,7 @@ export class FeelFX {
 
     gsap.delayedCall(1, () => {
       this.scene.remove(ring)
-      geometry.dispose()
-      material.dispose()
+      this.disposeObject(ring)
     })
 
     this.createScreenShake({
@@ -984,13 +1021,10 @@ export class FeelFX {
     gsap.delayedCall(
       instruction.duration ?? 2,
       () => {
-        this.scene.remove(group)
+        gsap.killTweensOf(group.children)
 
-        group.children.forEach(object => {
-          const mesh = object as THREE.Mesh
-          mesh.geometry.dispose()
-          ;(mesh.material as THREE.Material).dispose()
-        })
+        this.scene.remove(group)
+        this.disposeObject(group)
       }
     )
   }
@@ -1070,7 +1104,10 @@ export class FeelFX {
 
     gsap.delayedCall(
       instruction.duration ?? 3,
-      () => this.scene.remove(group)
+      () => {
+        this.scene.remove(group)
+        this.disposeObject(group)
+      }
     )
   }
 
@@ -1129,7 +1166,10 @@ export class FeelFX {
 
     gsap.delayedCall(
       instruction.duration ?? 3,
-      () => this.scene.remove(group)
+      () => {
+        this.scene.remove(group)
+        this.disposeObject(group)
+      }
     )
   }
 
@@ -1312,27 +1352,34 @@ export class FeelFX {
     const amount =
       intensity * 12
 
-    const originalX =
-      this.container.style.transform
+    const steps = Math.floor(
+      (instruction.duration ?? 0.5) * 25
+    )
 
     const timeline =
-      gsap.timeline()
+      gsap.timeline({
+        onComplete: () => {
+          this.container.style.transform = ''
+        }
+      })
 
-    const duration =
-      instruction.duration ?? 0.5
-
-    timeline.to(
-      this.container,
-      {
-        x: `random(-${amount},${amount})`,
-        y: `random(-${amount},${amount})`,
-        duration: 0.04,
-        repeat: Math.floor(
-          duration * 25
-        ),
-        ease: 'none'
-      }
-    )
+    for (let i = 0; i < steps; i++) {
+      timeline.to(
+        this.container,
+        {
+          x: () =>
+            THREE.MathUtils.randFloatSpread(
+              amount * 2
+            ),
+          y: () =>
+            THREE.MathUtils.randFloatSpread(
+              amount * 2
+            ),
+          duration: 0.04,
+          ease: 'none'
+        }
+      )
+    }
 
     timeline.set(this.container, {
       x: 0,
@@ -1340,8 +1387,6 @@ export class FeelFX {
     })
 
     this.timelines.push(timeline)
-
-    void originalX
   }
 
   // --------------------------------------------------
@@ -1428,7 +1473,10 @@ export class FeelFX {
 
     gsap.delayedCall(
       instruction.duration ?? 1.5,
-      () => this.scene.remove(group)
+      () => {
+        this.scene.remove(group)
+        this.disposeObject(group)
+      }
     )
   }
 
@@ -1519,6 +1567,8 @@ export class FeelFX {
     gsap.delayedCall(
       instruction.duration ?? 3,
       () => {
+        gsap.killTweensOf(group)
+
         group.children.forEach(
           object => {
             const mesh =
@@ -1533,6 +1583,11 @@ export class FeelFX {
             )
           }
         )
+
+        gsap.delayedCall(0.55, () => {
+          this.scene.remove(group)
+          this.disposeObject(group)
+        })
       }
     )
   }
@@ -1693,12 +1748,12 @@ export class FeelFX {
           ) {
             position.array[i * 3] =
               THREE.MathUtils.randFloatSpread(
-                this.container.clientWidth
+                this.viewWidth
               )
 
             position.array[i * 3 + 1] =
               THREE.MathUtils.randFloatSpread(
-                this.container.clientHeight
+                this.viewHeight
               )
 
             system.life[i] = 0
@@ -1763,6 +1818,8 @@ export class FeelFX {
   private lastTime = performance.now()
 
   private animate = () => {
+    if (!this.ready) return
+
     requestAnimationFrame(
       this.animate
     )
@@ -1795,6 +1852,8 @@ export class FeelFX {
       this.container
     )
 
+    this.container.style.transform = ''
+
     this.timelines.forEach(
       timeline => timeline.kill()
     )
@@ -1805,36 +1864,15 @@ export class FeelFX {
       .slice()
       .forEach(object => {
         this.scene.remove(object)
-
-        object.traverse(child => {
-          const mesh =
-            child as THREE.Mesh
-
-          if (mesh.geometry) {
-            mesh.geometry.dispose()
-          }
-
-          if (mesh.material) {
-            if (
-              Array.isArray(
-                mesh.material
-              )
-            ) {
-              mesh.material.forEach(
-                material =>
-                  material.dispose()
-              )
-            } else {
-              mesh.material.dispose()
-            }
-          }
-        })
+        this.disposeObject(object)
       })
 
     this.activeParticles = []
   }
 
   destroy() {
+    this.ready = false
+
     this.reset()
 
     window.removeEventListener(
@@ -1863,6 +1901,9 @@ export class FeelFX {
         this.container.clientHeight,
         1
       )
+
+    this.viewWidth = width
+    this.viewHeight = height
 
     this.camera.left =
       -width / 2
