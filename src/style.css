@@ -667,6 +667,268 @@ textarea {
 }
 
 /* =========================================================
+   EXPORT & PUBLISH (OPTIONAL INTEGRATIONS)
+
+   Isolated section. Adds the "Save to Google Drive" /
+   "Upload to YouTube" panel. Does not affect any
+   existing FeelFX layout or control.
+   ========================================================= */
+
+.export-panel {
+  flex-shrink: 0;
+
+  padding: 16px 28px;
+
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  background: #060606;
+}
+
+/*
+ * While the export panel is visible the page may
+ * grow beyond the viewport. Allow scrolling so the
+ * user can always get back up — this ONLY applies
+ * when the export panel is open (.export-open on
+ * body) and never affects normal FeelFX usage.
+ */
+body.export-open {
+  overflow-y: auto;
+}
+
+body.export-open .app {
+  height: auto;
+  min-height: 100%;
+}
+
+/*
+ * Pin the workspace to its EXACT original desktop
+ * size (100vh minus the 70px header and 260px
+ * output panel) so the video player keeps its
+ * normal height — the export panel simply grows
+ * the page below it and the scrollbar reaches it.
+ */
+body.export-open .workspace {
+  height: calc(100vh - 70px - 260px);
+  min-height: 0;
+  flex: none;
+}
+
+.export-header {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: 12px;
+}
+
+.export-note {
+  color:
+    rgba(255, 255, 255, 0.25);
+
+  font-size: 9px;
+}
+
+.export-actions {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-top: 12px;
+}
+
+.export-button {
+  padding: 9px 16px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.14);
+
+  border-radius: 7px;
+
+  color:
+    rgba(255, 255, 255, 0.8);
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.export-button:hover:not(:disabled) {
+  background:
+    rgba(255, 255, 255, 0.1);
+
+  transform:
+    translateY(-1px);
+}
+
+.export-button:disabled {
+  opacity: 0.4;
+
+  cursor: not-allowed;
+}
+
+.export-button-primary {
+  color: #050505;
+
+  background: white;
+}
+
+.export-button-primary:hover:not(:disabled) {
+  background:
+    rgba(255, 255, 255, 0.85);
+}
+
+.youtube-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-top: 12px;
+
+  max-width: 420px;
+}
+
+.export-input {
+  width: 100%;
+
+  padding: 9px 10px;
+
+  outline: none;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.1);
+
+  border-radius: 7px;
+
+  color:
+    rgba(255, 255, 255, 0.8);
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  font-size: 10px;
+
+  font-family: inherit;
+}
+
+.export-input:focus {
+  border-color:
+    rgba(255, 255, 255, 0.3);
+}
+
+.export-textarea {
+  height: 60px;
+
+  resize: vertical;
+}
+
+.export-progress-wrap {
+  margin-top: 12px;
+
+  max-width: 420px;
+}
+
+.export-status {
+  color:
+    rgba(255, 255, 255, 0.6);
+
+  font-size: 10px;
+
+  min-height: 14px;
+}
+
+.export-progress {
+  width: 100%;
+  height: 3px;
+
+  margin-top: 6px;
+
+  overflow: hidden;
+
+  background:
+    rgba(255, 255, 255, 0.08);
+}
+
+.export-progress div {
+  width: 0%;
+  height: 100%;
+
+  background: white;
+
+  transition:
+    width 0.3s ease;
+}
+
+.export-result {
+  margin-top: 10px;
+
+  font-size: 10px;
+
+  line-height: 1.6;
+}
+
+.export-result a {
+  color: white;
+
+  text-decoration: underline;
+}
+
+.export-success {
+  color: #7ee787;
+}
+
+.export-error {
+  color: #ff7b72;
+}
+
+.export-muted {
+  color:
+    rgba(255, 255, 255, 0.35);
+}
+
+/* Mobile adjustments for the export panel */
+@media (max-width: 768px) {
+  body.export-open .export-panel {
+    position: relative;
+  }
+  .export-panel {
+    padding: 14px 16px;
+  }
+
+  .export-actions {
+    flex-direction: column;
+  }
+
+  .export-button {
+    width: 100%;
+
+    min-height: 44px;
+  }
+
+  .youtube-form,
+  .export-progress-wrap {
+    max-width: none;
+  }
+}
+
+/* =========================================================
    MOBILE
    Completely isolated from desktop.
    ========================================================= */

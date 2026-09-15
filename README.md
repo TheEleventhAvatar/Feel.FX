@@ -429,6 +429,74 @@ And then decide what the motion design should be.
 
 ---
 
+## 📤 Export & Publish (Optional — Google Drive / YouTube)
+
+After a video has been successfully analyzed, an **"Export & Publish"** section appears below the output panel:
+
+```text
+[ Save to Google Drive ]
+[ Upload to YouTube ]
+```
+
+These integrations are **completely optional** and are kept **fully isolated** from the FeelFX core pipeline (analysis → DSL → Three.js/GSAP). They simply upload the **existing video file you loaded** — no video is re-processed or sent through a new pipeline.
+
+### ✅ Works with zero configuration
+
+If no Google credentials are configured:
+
+* FeelFX works exactly as before.
+* Clicking either export button shows a friendly "not configured" message pointing at the README.
+* No Google scripts are loaded, no errors are thrown.
+
+### 🔧 Enabling the integrations
+
+1. Copy the example environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+2. Follow the step-by-step instructions inside `.env.example` to create a Google OAuth **Client ID** (enable the *Google Drive API* and *YouTube Data API v3*, create a "Web application" OAuth client, and add your dev origin, e.g. `http://localhost:5173`).
+
+3. Put the Client ID in `.env.local`:
+
+```text
+VITE_GOOGLE_CLIENT_ID=your-client-id-here.apps.googleusercontent.com
+```
+
+4. Restart the dev server. The export buttons now authenticate with Google on first use.
+
+### 🔐 Scopes & privacy
+
+* `drive.file` — the app can only see/manage Drive files **it created itself** (full Drive access is never requested).
+* `youtube.upload` — allows uploading videos to your channel.
+* The OAuth token lives only in memory; nothing is stored server-side (FeelFX has no server).
+* **Never put a client secret in `.env.local`** — browsers cannot keep secrets, and none is needed for the implicit token flow.
+
+### 📁 Module layout
+
+```text
+src/integrations/
+├── googleAuth.ts     # Optional Google OAuth (GIS token flow)
+├── googleDrive.ts    # Drive v3 resumable upload + progress
+├── youtube.ts        # YouTube Data API v3 resumable upload
+└── exportPanel.ts    # Isolated "Export & Publish" UI section
+```
+
+None of these modules are imported by the FeelFX analysis, event, or rendering engines — only `main.ts` mounts the panel, additively, after a video has been analyzed.
+
+### 📺 YouTube upload options
+
+The YouTube flow lets you set:
+
+* **Title** (pre-filled with your file name)
+* **Description**
+* **Privacy status** — `private` (default), `unlisted`, or `public`
+
+Upload progress is shown live, and the resulting watch link is displayed once the upload completes (YouTube processing continues in the background).
+
+---
+
 ## ⚡ Feel the Video
 
 **FeelFX**
@@ -436,5 +504,3 @@ And then decide what the motion design should be.
 *Don't subtitle the video.*
 
 **Feel it.**
-
-

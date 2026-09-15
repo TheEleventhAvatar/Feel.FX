@@ -11,6 +11,15 @@ import {
 
 import { MotionRenderer } from './motionrenderer'
 
+/*
+ * OPTIONAL integrations (Google Drive / YouTube).
+ *
+ * Fully isolated from the FeelFX core pipeline.
+ * If Google credentials are not configured, the
+ * app behaves exactly as before.
+ */
+import { createExportPanel } from './integrations/exportPanel'
+
 const app =
   document.querySelector<HTMLDivElement>('#app')!
 
@@ -232,6 +241,25 @@ app.innerHTML = `
   </div>
 `
 
+/*
+ * "Export & Publish" — optional Google Drive /
+ * YouTube uploads of the EXISTING loaded video.
+ *
+ * Mounted additively after the output panel.
+ * Kept separate from all FeelFX controls.
+ */
+const exportPanel =
+  createExportPanel(
+    () => currentVideoFile,
+    () => currentVideoFileName
+  )
+
+document
+  .querySelector('.app')!
+  .appendChild(
+    exportPanel.root
+  )
+
 /* --------------------------------------------------
  * DOM
  * -------------------------------------------------- */
@@ -342,6 +370,15 @@ const motionLayer =
 
 let videoURL: string | null = null
 
+/*
+ * Reference to the EXISTING video file the user
+ * loaded. Used only by the optional export
+ * integrations (Drive / YouTube). The core
+ * pipeline never depends on this.
+ */
+let currentVideoFile: File | Blob | null = null
+let currentVideoFileName = 'feelfx-video.mp4'
+
 let currentEvents:
   ReturnType<typeof generateEvents> = []
 
@@ -373,6 +410,14 @@ fileInput.addEventListener(
     if (!file) {
       return
     }
+
+    currentVideoFile =
+      file
+
+    currentVideoFileName =
+      file.name || 'feelfx-video.mp4'
+
+    exportPanel.reset()
 
     if (videoURL) {
       URL.revokeObjectURL(
@@ -913,6 +958,39 @@ feelButton.addEventListener(
 
       status.textContent =
         'LIVE'
+
+      /*
+       * Video has been successfully analyzed →
+       * the optional export panel becomes
+       * available. Purely additive; if this
+       * fails, FeelFX is unaffected.
+       */
+      if (currentVideoFile) {
+        /*
+         * Revealing the export panel changes the
+         * page layout; remember where the user
+         * is looking and restore that exact view
+         * after the panel appears (no auto-scroll).
+         */
+        const scrollX =
+          window.scrollX
+
+        const scrollY =
+          window.scrollY
+
+        exportPanel.enable(
+          currentVideoFileName
+        )
+
+        requestAnimationFrame(
+          () => {
+            window.scrollTo(
+              scrollX,
+              scrollY
+            )
+          }
+        )
+      }
 
     } catch (
       error
