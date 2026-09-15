@@ -26,14 +26,22 @@ interface GisTokenResponse {
   error?: string
 }
 
+/*
+ * The GIS API lives at `window.google.accounts.oauth2`.
+ * Everything is optional so we can fail with a friendly
+ * error if the script was blocked (ad blocker, offline…)
+ * instead of throwing deep inside the auth flow.
+ */
 interface GisGlobal {
-  accounts: {
-    oauth2: {
-      initTokenClient: (config: {
-        client_id: string
-        scope: string
-        callback: (response: GisTokenResponse) => void
-      }) => GisTokenClient
+  google?: {
+    accounts?: {
+      oauth2?: {
+        initTokenClient: (config: {
+          client_id: string
+          scope: string
+          callback: (response: GisTokenResponse) => void
+        }) => GisTokenClient
+      }
     }
   }
 }
@@ -85,7 +93,7 @@ function loadGis(): Promise<GisGlobal> {
         )
 
       if (existing) {
-        if ((window as unknown as GisGlobal).accounts) {
+        if (getOauth2(window as unknown as GisGlobal)) {
           resolve(window as unknown as GisGlobal)
         } else {
           existing.addEventListener('load', () =>
@@ -122,6 +130,11 @@ function loadGis(): Promise<GisGlobal> {
   return gisScriptPromise
 }
 
+/** Safely reaches `window.google.accounts.oauth2`. */
+function getOauth2(gis: GisGlobal) {
+  return gis.google?.accounts?.oauth2 ?? null
+}
+
 /**
  * Returns a valid Google OAuth access token,
  * prompting the user via the GIS popup when needed.
@@ -150,11 +163,20 @@ export async function getGoogleAccessToken(): Promise<
 
   const gis = await loadGis()
 
+  const oauth2 =
+    getOauth2(gis)
+
+  if (!oauth2) {
+    throw new Error(
+      'Google Identity Services did not initialize. It may be blocked by an ad blocker, privacy extension, or network policy.'
+    )
+  }
+
   const token =
     await new Promise<string>(
       (resolve, reject) => {
         const tokenClient =
-          gis.accounts.oauth2.initTokenClient({
+          oauth2.initTokenClient({
             client_id: clientId,
             scope: GOOGLE_SCOPES,
             callback: response => {

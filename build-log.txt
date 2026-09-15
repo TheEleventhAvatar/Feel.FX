@@ -1,0 +1,20 @@
+
+> feel-fx@0.0.0 build
+> tsc && vite build
+
+[36mvite v8.2.2 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 39 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                 1.13 kB │ gzip:     0.47 kB
+dist/assets/ort-wasm-simd-threaded.asyncify-DMmc6YqF.wasm  23,567.05 kB │ gzip: 5,824.05 kB
+dist/assets/index-Dw0Bi0bz.css                                 11.69 kB │ gzip:     2.82 kB
+dist/assets/index-Daswf5kr.js                               1,148.27 kB │ gzip:   319.14 kB
+
+[32m✓ built in 825ms[39m
+[33m[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
