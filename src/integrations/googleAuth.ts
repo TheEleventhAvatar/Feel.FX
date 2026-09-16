@@ -50,14 +50,19 @@ const GIS_SCRIPT_URL =
   'https://accounts.google.com/gsi/client'
 
 /*
- * Scopes for the two optional integrations:
- *  - drive.file  → create/manage ONLY files this app created
- *  - youtube.upload → upload videos to the user's channel
+ * Scopes for the two optional integrations.
+ *
+ * IMPORTANT: Google rejects certain scope combinations in a
+ * single OAuth request ("This request contains scopes that
+ * cannot be requested together") — drive.file and
+ * youtube.upload are one such pair. Each integration must
+ * therefore request ONLY its own scope, one at a time.
  */
-export const GOOGLE_SCOPES = [
-  'https://www.googleapis.com/auth/drive.file',
+export const DRIVE_SCOPE =
+  'https://www.googleapis.com/auth/drive.file'
+
+export const YOUTUBE_UPLOAD_SCOPE =
   'https://www.googleapis.com/auth/youtube.upload'
-].join(' ')
 
 /** OAuth Client ID from Vite env (VITE_GOOGLE_CLIENT_ID). */
 export function getGoogleClientId(): string | null {
@@ -73,8 +78,15 @@ export function isGoogleConfigured(): boolean {
 }
 
 let gisScriptPromise: Promise<GisGlobal> | null = null
-let cachedAccessToken: string | null = null
-let tokenExpiry = 0
+
+/*
+ * One cached token PER SCOPE-SET, since Drive and
+ * YouTube have to be authorized separately.
+ */
+const tokenCache = new Map<
+  string,
+  { token: string; expiry: number }
+>()
 
 /**
  * Dynamically loads the GIS script once.
@@ -136,29 +148,40 @@ function getOauth2(gis: GisGlobal) {
 }
 
 /**
- * Returns a valid Google OAuth access token,
- * prompting the user via the GIS popup when needed.
+ * Returns a valid Google OAuth access token for the given
+ * scope(s), prompting the user via the GIS popup when needed.
+ *
+ * IMPORTANT: pass ONE integration's scope at a time —
+ * Google forbids combining e.g. drive.file with
+ * youtube.upload in a single request.
  *
  * Returns `null` (never throws for config issues)
  * when Google is not configured.
  */
-export async function getGoogleAccessToken(): Promise<
-  string | null
-> {
+export async function getGoogleAccessToken(
+  scopes: string[]
+): Promise<string | null> {
   const clientId = getGoogleClientId()
 
   if (!clientId) {
     return null
   }
 
-  // Reuse a still-valid token.
-  const now = Date.now()
+  const scopeKey =
+    scopes.join(' ')
+
+  // Reuse a still-valid token for these scopes.
+  const cached =
+    tokenCache.get(scopeKey)
+
+  const now =
+    Date.now()
 
   if (
-    cachedAccessToken &&
-    now < tokenExpiry - 60_000
+    cached &&
+    now < cached.expiry - 60_000
   ) {
-    return cachedAccessToken
+    return cached.token
   }
 
   const gis = await loadGis()
@@ -178,7 +201,7 @@ export async function getGoogleAccessToken(): Promise<
         const tokenClient =
           oauth2.initTokenClient({
             client_id: clientId,
-            scope: GOOGLE_SCOPES,
+            scope: scopeKey,
             callback: response => {
               if (response.error) {
                 reject(
@@ -198,19 +221,19 @@ export async function getGoogleAccessToken(): Promise<
                 return
               }
 
-              cachedAccessToken =
-                response.access_token
-
-              tokenExpiry =
-                Date.now() +
-                (response.expires_in ?? 3600) * 1000
+              tokenCache.set(scopeKey, {
+                token: response.access_token,
+                expiry:
+                  Date.now() +
+                  (response.expires_in ?? 3600) * 1000
+              })
 
               resolve(response.access_token)
             }
           })
 
         tokenClient.requestAccessToken({
-          prompt: cachedAccessToken ? '' : 'consent'
+          prompt: cached ? '' : 'consent'
         })
       }
     )
@@ -218,8 +241,7 @@ export async function getGoogleAccessToken(): Promise<
   return token
 }
 
-/** Clears the cached token (used after an auth error). */
+/** Clears all cached tokens (used after an auth error). */
 export function clearGoogleToken(): void {
-  cachedAccessToken = null
-  tokenExpiry = 0
+  tokenCache.clear()
 }

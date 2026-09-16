@@ -16,6 +16,7 @@
 
 import {
   clearGoogleToken,
+  DRIVE_SCOPE,
   getGoogleAccessToken
 } from './googleAuth'
 
@@ -60,7 +61,9 @@ export async function uploadToDrive(
       status: 'auth'
     })
 
-    const token = await getGoogleAccessToken()
+    const token = await getGoogleAccessToken([
+      DRIVE_SCOPE
+    ])
 
     if (!token) {
       return {

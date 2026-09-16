@@ -15,6 +15,7 @@
 
 import {
   clearGoogleToken,
+  YOUTUBE_UPLOAD_SCOPE,
   getGoogleAccessToken
 } from './googleAuth'
 
@@ -74,7 +75,9 @@ export async function uploadToYouTube(
       status: 'auth'
     })
 
-    const token = await getGoogleAccessToken()
+    const token = await getGoogleAccessToken([
+      YOUTUBE_UPLOAD_SCOPE
+    ])
 
     if (!token) {
       return {
